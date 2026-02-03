@@ -1,0 +1,139 @@
+# MongoDB Schema
+
+## Book Review Admin System
+
+---
+
+This document defines the MongoDB schema for the **Book Review Admin System**, based on the approved PRD.
+
+The schema is designed to be:
+
+- Simple
+- Explicit
+- Easy to query and maintain
+- Aligned with Spring Boot + MongoDB usage
+
+---
+
+## 1. Collections Overview
+
+| Collection     | Purpose                                 |
+| -------------- | --------------------------------------- |
+| `admin_users`  | Stores admin login credentials          |
+| `book_reviews` | Stores book review metadata and content |
+
+---
+
+## 2. `admin_users` Collection
+
+### 2.1 Purpose
+
+Stores admin authentication data.
+
+Admin accounts are **manually created by the developer** directly in MongoDB.
+
+---
+
+### 2.2 Document Structure
+
+```json
+{
+  "_id": "ObjectId",
+  "adminUserId": "ObjectId",
+  "title": "Atomic Habits",
+  "author": "James Clear",
+  "rating": 4,
+  "reviewDate": "2026-01-18",
+  "coverImageUrl": "/images/atomic-habits.jpg",
+  "content": "<p>This book explains...</p>",
+  "createdAt": "2026-01-18T09:00:00Z",
+  "updatedAt": "2026-01-18T09:00:00Z"
+}
+```
+
+---
+
+### 3.3 Field Definitions
+
+| Field           | Type     | Required | Description                            |
+| --------------- | -------- | -------- | -------------------------------------- |
+| `_id`           | ObjectId | Yes      | Primary key                            |
+| `adminUserId`   | ObjectId | Yes      | Reference to admin_users.\_id          |
+| `title`         | String   | Yes      | Book title                             |
+| `author`        | String   | Yes      | Book author                            |
+| `rating`        | Number   | Yes      | Rating (1–5)                           |
+| `reviewDate`    | Date     | Yes      | Date of review                         |
+| `coverImageUrl` | String   | No       | URL or path to cover image             |
+| `content`       | String   | Yes      | Review body (HTML converted from Word) |
+| `createdAt`     | Date     | Yes      | Creation timestamp                     |
+| `updatedAt`     | Date     | Yes      | Last update timestamp                  |
+
+---
+
+### 3.4 Validation Rules (Recommended)
+
+````js
+{
+  adminUserId: { $type: "objectId" },
+
+```js
+{
+  title: { $type: "string" },
+  author: { $type: "string" },
+  rating: { $gte: 1, $lte: 5 },
+  content: { $type: "string" }
+}
+````
+
+---
+
+### 3.5 Indexes
+
+```js
+{
+  reviewDate: -1;
+}
+```
+
+- Index on `reviewDate` for latest-first sorting
+
+---
+
+## 4. Design Decisions
+
+### 4.1 Why No Separate Metadata Collection?
+
+- Review volume is low
+- Reads are content-centric
+- Simpler querying and rendering
+
+---
+
+### 4.2 Why Store Content as HTML?
+
+- Word documents are converted at upload time
+- Avoids repeated parsing
+- Direct rendering on frontend
+
+---
+
+## 5. Spring Boot Mapping Notes
+
+- Use `@Document(collection = "admin_users")`
+- Use `@Document(collection = "book_reviews")`
+- Map dates using `java.time.Instant` or `LocalDate`
+
+---
+
+## 6. Future Extensions (Optional)
+
+- `slug` field for SEO-friendly URLs
+- `status` field (draft / published)
+- `tags` array for categorization
+
+---
+
+## 7. Status
+
+- Schema finalized
+- Ready for repository & API implementation
