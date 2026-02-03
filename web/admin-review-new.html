@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Book Review</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<header class="admin-header">
+  <h1>Add Book Review</h1>
+  <form method="POST" action="/admin/logout">
+    <button class="logout-btn">Logout</button>
+  </form>
+</header>
+
+<main class="admin-main">
+
+  <form
+          class="review-form"
+          method="POST"
+          action="/admin/reviews"
+          enctype="multipart/form-data"
+  >
+
+    <section class="form-section">
+      <h2>Metadata</h2>
+
+      <label>
+        Book Title
+        <input type="text" name="title" required />
+      </label>
+
+      <label>
+        Author
+        <input type="text" name="author" required />
+      </label>
+
+      <label>
+        Rating (1–5)
+        <input type="number" name="rating" min="1" max="5" required />
+      </label>
+
+      <label>
+        Review Date
+        <input type="date" name="reviewDate" required />
+      </label>
+
+      <label>
+        Cover Image
+        <input type="file" name="coverImage" accept="image/*" />
+      </label>
+    </section>
+
+    <section class="form-section">
+      <h2>Review Content</h2>
+
+      <label>
+        Word File (optional)
+        <input type="file" name="docFile" accept=".doc,.docx" />
+      </label>
+
+      <label>
+        Review Content (HTML)
+        <textarea name="content" rows="12"></textarea>
+      </label>
+    </section>
+
+    <div class="form-actions">
+      <button type="submit">Publish Review</button>
+    </div>
+
+  </form>
+</main>
+
+</body>
+</html>

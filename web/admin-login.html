@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="auth-body">
+
+<main class="auth-container">
+  <h1 class="auth-title">Admin Login</h1>
+
+  <form method="POST" action="/admin/login" class="auth-form">
+    <label>
+      Username
+      <input type="text" name="username" required />
+    </label>
+
+    <label>
+      Password
+      <input type="password" name="password" required />
+    </label>
+
+    <button type="submit">Login</button>
+  </form>
+
+  <!-- Spring Security error handling -->
+  <p class="auth-error">
+    <!-- show only when login fails -->
+    Invalid username or password
+  </p>
+</main>
+
+</body>
+</html>
