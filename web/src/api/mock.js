@@ -32,6 +32,7 @@ mock.onPost('/admin/login').reply(config => {
   const password = params.get('password');
 
   if (username === 'test' && password === '1234') {
+    localStorage.setItem('isAuthenticated', 'true');
     return [200, { message: 'Success' }];
   } else {
     return [401, { message: 'Invalid username or password' }];
@@ -39,7 +40,10 @@ mock.onPost('/admin/login').reply(config => {
 });
 
 // 1.2 Logout
-mock.onPost('/admin/logout').reply(200);
+mock.onPost('/admin/logout').reply(() => {
+  localStorage.removeItem('isAuthenticated');
+  return [200];
+});
 
 // 3.1 Create Book Review
 mock.onPost('/admin/reviews').reply(config => {
