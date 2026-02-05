@@ -11,6 +11,10 @@ const routes = [
     component: LoginView
   },
   {
+    path: '/',
+    redirect: '/admin/login'
+  },
+  {
     path: '/admin',
     name: 'Dashboard',
     component: DashboardView
@@ -24,11 +28,8 @@ const routes = [
     path: '/admin/reviews/:id',
     name: 'ReviewDetail',
     component: ReviewDetailView
-  },
-  {
-    path: '/',
-    redirect: '/admin/login'
   }
+
 ]
 
 const router = createRouter({
@@ -39,7 +40,7 @@ const router = createRouter({
 // Navigation Guard: 로그인 여부 확인
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-
+  console.info('isAuthenticated:', isAuthenticated);
   if (to.path.startsWith('/admin') && to.path !== '/admin/login' && !isAuthenticated) {
     // 로그인이 필요한 페이지에 접근 시 로그인 페이지로 리다이렉트
     next('/admin/login');

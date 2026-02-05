@@ -149,13 +149,14 @@ HTTP 201 Created
 **Endpoint**
 
 ```
-GET /api/reviews
+GET /api/reviews?page={page}&offset={offset}
 ```
 
 **Description**
 
 - Returns a list of published book reviews
 - Sorted by review date (latest first)
+- shows 30 review per page
 
 **Authentication**
 
@@ -171,7 +172,10 @@ GET /api/reviews
     "author": "James Clear",
     "rating": 4,
     "reviewDate": "2026-01-18",
-    "coverImageUrl": "/images/atomic-habits.jpg"
+    "coverImageUrl": "/images/atomic-habits.jpg",
+    "total": 100,
+    "page": 1,
+    "offset" : 30
   }
 ]
 ```

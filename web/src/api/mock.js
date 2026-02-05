@@ -4,26 +4,38 @@ import api from './index';
 const mock = new MockAdapter(api, { delayResponse: 500 });
 
 // 가짜 리뷰 데이터
-let reviews = [
-  {
-    id: '1',
-    title: 'Atomic Habits',
-    author: 'James Clear',
-    rating: 5,
-    reviewDate: '2026-01-18',
-    coverImageUrl: 'https://images-na.ssl-images-amazon.com/images/I/91bYsX41DVL.jpg',
-    content: '<p>This book explains how small changes can lead to remarkable results.</p>'
-  },
-  {
-    id: '2',
-    title: 'The Midnight Library',
-    author: 'Matt Haig',
-    rating: 4,
-    reviewDate: '2026-01-15',
-    coverImageUrl: 'https://images-na.ssl-images-amazon.com/images/I/810vIom6C6L.jpg',
-    content: '<p>A beautiful story about the choices that make up a life.</p>'
-  }
-];
+let reviews = Array.from({ length: 35 }, (_, i) => {
+  const id = String(i + 1);
+  return {
+    id,
+    title: `Mock Book Title ${id}`,
+    author: `Author ${id}`,
+    rating: (i % 5) + 1,
+    reviewDate: new Date(2026, 0, 35 - i).toISOString().split('T')[0],
+    coverImageUrl: `https://via.placeholder.com/150?text=Book+${id}`,
+    content: `<p>This is a mock review content for book ${id}. It contains some sample text to test the layout and pagination.</p>`
+  };
+});
+
+// 초기 데이터 중 일부를 구체적인 데이터로 교체 (선택 사항)
+reviews[0] = {
+  id: '1',
+  title: 'Atomic Habits',
+  author: 'James Clear',
+  rating: 5,
+  reviewDate: '2026-01-18',
+  coverImageUrl: 'https://images-na.ssl-images-amazon.com/images/I/91bYsX41DVL.jpg',
+  content: '<p>This book explains how small changes can lead to remarkable results.</p>'
+};
+reviews[1] = {
+  id: '2',
+  title: 'The Midnight Library',
+  author: 'Matt Haig',
+  rating: 4,
+  reviewDate: '2026-01-15',
+  coverImageUrl: 'https://images-na.ssl-images-amazon.com/images/I/810vIom6C6L.jpg',
+  content: '<p>A beautiful story about the choices that make up a life.</p>'
+};
 
 // 1.1 Login
 mock.onPost('/admin/login').reply(config => {
@@ -62,7 +74,26 @@ mock.onPost('/admin/reviews').reply(config => {
 });
 
 // 4.1 Get All Book Reviews
-mock.onGet('/api/reviews').reply(200, reviews);
+mock.onGet(/\/api\/reviews(\?.*)?/).reply(config => {
+  console.log('Mock GET /api/reviews called', config.url);
+  const url = config.url.includes('?') ? config.url : config.url + '?';
+  const params = new URLSearchParams(url.split('?')[1]);
+  const page = parseInt(params.get('page')) || 1;
+  const offset = parseInt(params.get('offset')) || 30;
+
+  const start = (page - 1) * offset;
+  const end = start + offset;
+  const paginatedReviews = reviews.slice(start, end);
+
+  const response = paginatedReviews.map(r => ({
+    ...r,
+    total: reviews.length,
+    page: page,
+    offset: offset
+  }));
+
+  return [200, response];
+});
 
 // 4.2 Get Book Review Detail
 mock.onGet(/\/api\/reviews\/\d+/).reply(config => {
