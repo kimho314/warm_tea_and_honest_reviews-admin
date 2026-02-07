@@ -1,20 +1,20 @@
 package com.luna.warmteaandhonestreviews.domain;
 
+import java.time.Instant;
+import java.util.Objects;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
-import java.util.Objects;
-
 @Document(collection = "book_reviews")
 public class BookReviewEntity extends BaseEntity {
+
     @Id
     private String id;
     private String adminUserId;
     private String title;
     private String author;
     private Double rating;
-    private Instant reviewData;
+    private Instant reviewDate;
     private String coverImageUrl;
     private String contentHtml;
 
@@ -23,17 +23,29 @@ public class BookReviewEntity extends BaseEntity {
     }
 
     public BookReviewEntity(String adminUserId,
-                            String title,
-                            String author,
-                            Double rating,
-                            Instant reviewData,
-                            String coverImageUrl,
-                            String contentHtml) {
+        String title,
+        String author,
+        Double rating,
+        Instant reviewDate,
+        String coverImageUrl,
+        String contentHtml) {
+        this(null, adminUserId, title, author, rating, reviewDate, coverImageUrl, contentHtml);
+    }
+
+    public BookReviewEntity(String id,
+        String adminUserId,
+        String title,
+        String author,
+        Double rating,
+        Instant reviewDate,
+        String coverImageUrl,
+        String contentHtml) {
+        this.id = id;
         this.adminUserId = adminUserId;
         this.title = title;
         this.author = author;
         this.rating = rating;
-        this.reviewData = reviewData;
+        this.reviewDate = reviewDate;
         this.coverImageUrl = coverImageUrl;
         this.contentHtml = contentHtml;
     }
@@ -58,8 +70,8 @@ public class BookReviewEntity extends BaseEntity {
         return rating;
     }
 
-    public Instant getReviewData() {
-        return reviewData;
+    public Instant getReviewDate() {
+        return reviewDate;
     }
 
     public String getCoverImageUrl() {
@@ -83,8 +95,8 @@ public class BookReviewEntity extends BaseEntity {
         this.rating = rating;
     }
 
-    public void setReviewData(Instant reviewData) {
-        this.reviewData = reviewData;
+    public void setReviewDate(Instant reviewDate) {
+        this.reviewDate = reviewDate;
     }
 
     public void setCoverImageUrl(String coverImageUrl) {
@@ -97,7 +109,9 @@ public class BookReviewEntity extends BaseEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BookReviewEntity that = (BookReviewEntity) o;
         return Objects.equals(id, that.id);
@@ -111,14 +125,14 @@ public class BookReviewEntity extends BaseEntity {
     @Override
     public String toString() {
         return "BookReviewEntity{" +
-                "id='" + id + '\'' +
-                ", adminUserId='" + adminUserId + '\'' +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", rating=" + rating +
-                ", reviewData=" + reviewData +
-                ", coverImageUrl='" + coverImageUrl + '\'' +
-                ", contentHtml='" + contentHtml + '\'' +
-                "} " + super.toString();
+            "id='" + id + '\'' +
+            ", adminUserId='" + adminUserId + '\'' +
+            ", title='" + title + '\'' +
+            ", author='" + author + '\'' +
+            ", rating=" + rating +
+            ", reviewData=" + reviewDate +
+            ", coverImageUrl='" + coverImageUrl + '\'' +
+            ", contentHtml='" + contentHtml + '\'' +
+            "} " + super.toString();
     }
 }

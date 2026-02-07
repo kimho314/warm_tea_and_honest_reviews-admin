@@ -1,16 +1,19 @@
 spring:
-    application:
-        name: warm-tea-and-honest-reviews
-    mongodb:
-        uri: mongodb+srv://hoseopi:password1234!@cluster0.5b3qylf.mongodb.net/?appName=Cluster0
-        database: lotus
+  application:
+    name: warm-tea-and-honest-reviews
+  mongodb:
+    uri: mongodb+srv://hoseopi:password1234!@cluster0.5b3qylf.mongodb.net/?appName=Cluster0
+    database: lotus
+  docker:
+    compose:
+      enabled: false
 
 server:
   port: 8080
   tomcat:
-      max-connections: 8192
-      threads:
-          max: 200
-          min-spare: 10
-      accept-count: 100
-      connection-timeout: 10000
+    max-connections: 8192
+    threads:
+      max: 200
+      min-spare: 10
+    accept-count: 100
+    connection-timeout: 10000
