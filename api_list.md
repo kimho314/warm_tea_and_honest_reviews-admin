@@ -173,9 +173,10 @@ GET /api/reviews?page={page}&offset={offset}
     "rating": 4,
     "reviewDate": "2026-01-18",
     "coverImageUrl": "/images/atomic-habits.jpg",
+    "content": "<p>This book explains...</p>",
     "total": 100,
     "page": 1,
-    "offset" : 30
+    "offset": 30
   }
 ]
 ```
