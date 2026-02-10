@@ -2,15 +2,12 @@ package com.luna.warmteaandhonestreviews.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.luna.warmteaandhonestreviews.AbstracTest;
+import com.luna.warmteaandhonestreviews.AbstractTest;
 import com.luna.warmteaandhonestreviews.config.MongoDBConfig;
 import com.luna.warmteaandhonestreviews.domain.AdminUserEntity;
 import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -32,43 +29,35 @@ public class BookReviewRepositoryTest {
 
     @AfterEach
     void tearDown() {
-//        bookReviewRepository.deleteAll();
+        bookReviewRepository.deleteAll();
     }
 
     @Test
     void saveTest() {
         // given
-        String adminUserId = UUID.randomUUID().toString();
-        BookReviewEntity bookReview = new BookReviewEntity(adminUserId,
-            "title",
-            "author",
-            4.3,
-            LocalDateTime.now().toInstant(ZoneOffset.UTC),
-            "image",
-            "html");
-
+        BookReviewEntity bookReview = AbstractTest.bookReview1;
         // when
         BookReviewEntity saved = bookReviewRepository.save(bookReview);
 
         //then
         log.info("saved={}", saved);
         assertThat(saved).isNotNull();
-        assertThat(saved.getTitle()).isEqualTo("title");
-        assertThat(saved.getAuthor()).isEqualTo("author");
-        assertThat(saved.getRating()).isEqualTo(4.3);
-        assertThat(saved.getAdminUserId()).isEqualTo(adminUserId);
-        assertThat(saved.getCoverImageUrl()).isEqualTo("image");
-        assertThat(saved.getContentHtml()).isEqualTo("html");
+        assertThat(saved.getTitle()).isEqualTo(bookReview.getTitle());
+        assertThat(saved.getAuthor()).isEqualTo(bookReview.getAuthor());
+        assertThat(saved.getRating()).isEqualTo(bookReview.getRating());
+        assertThat(saved.getAdminUserId()).isEqualTo(bookReview.getAdminUserId());
+        assertThat(saved.getCoverImage()).isEqualTo(bookReview.getCoverImage());
+        assertThat(saved.getExcerpt()).isEqualTo(bookReview.getExcerpt());
     }
 
     @Test
     void findByAdminUserIdTest() {
         // given
-        AdminUserEntity adminUser1 = AbstracTest.adminUser1;
+        AdminUserEntity adminUser1 = AbstractTest.adminUser1;
 
         List<BookReviewEntity> list = new ArrayList<>();
-        list.add(AbstracTest.bookReview1);
-        list.add(AbstracTest.bookReview2);
+        list.add(AbstractTest.bookReview1);
+        list.add(AbstractTest.bookReview2);
 
         // when
         bookReviewRepository.saveAll(list);

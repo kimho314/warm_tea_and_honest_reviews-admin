@@ -2,9 +2,16 @@ package com.luna.warmteaandhonestreviews.controller;
 
 import com.luna.warmteaandhonestreviews.dto.GetReviewsRespDto;
 import com.luna.warmteaandhonestreviews.dto.ReviewDto;
+import com.luna.warmteaandhonestreviews.dto.SaveReviewReqDto;
+import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
 import com.luna.warmteaandhonestreviews.service.ReviewService;
 import com.luna.warmteaandhonestreviews.service.StorageService;
+import java.time.LocalDate;
+import java.util.Optional;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/reviews")
 public class ReviewController {
 
+    private static final Logger log = LoggerFactory.getLogger(ReviewController.class);
     private final ReviewService reviewService;
     private final StorageService storageService;
 
@@ -41,10 +50,41 @@ public class ReviewController {
             reviewService.getReviews("162a59e1-571f-42a3-a41a-edc83b03618a", page, offset));
     }
 
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createReview(@RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SaveReviewRespDto> createReview(@RequestPart("cover") MultipartFile file,
+        @RequestPart("title") String title,
+        @RequestPart("author") String author,
+        @RequestPart("rating") Double rating,
+        @RequestPart("page") Integer page,
+        @RequestPart("language") String language,
+        @RequestPart("category") String category,
+        @RequestPart("publishedAt") @DateTimeFormat(pattern = "yyyy-MM-dd") String publishedAt,
+        @RequestPart(value = "excerpt", required = false) String excerpt) {
+        log.info(
+            "create review. title: {}, author: {}, rating: {}, page: {}, language: {}, category: {}, publishedAt: {}, excerpt: {}",
+            title, author, rating, page, language, category, publishedAt, excerpt);
+        Optional<ReviewDto> maybeReview = reviewService.getByTitle(title);
+        if (maybeReview.isPresent()) {
+            return ResponseEntity.ok(new SaveReviewRespDto(maybeReview.get().id()));
+        }
+
+        // need to get admin user info
+
         storageService.store(file);
-        return ResponseEntity.ok().build();
+        SaveReviewRespDto resp = reviewService.save(
+            new SaveReviewReqDto("162a59e1-571f-42a3-a41a-edc83b03618a",
+                title,
+                author,
+                rating,
+                page,
+                language,
+                category,
+                LocalDate.parse(publishedAt),
+                excerpt,
+                file.getOriginalFilename())
+        );
+        return ResponseEntity.ok(resp);
     }
 
 }

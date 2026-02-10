@@ -1,12 +1,12 @@
 package com.luna.warmteaandhonestreviews.domain;
 
 
+import java.time.Instant;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.Instant;
-
 public class BaseEntity {
+
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
@@ -23,8 +23,8 @@ public class BaseEntity {
     @Override
     public String toString() {
         return "BaseEntity{" +
-                "createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+            "createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            '}';
     }
 }

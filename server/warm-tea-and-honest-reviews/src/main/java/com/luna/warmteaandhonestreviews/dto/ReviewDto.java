@@ -5,21 +5,31 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 
 public record ReviewDto(String id,
+                        String adminUserId,
                         String title,
                         String author,
                         Double rating,
-                        LocalDate reviewDate,
-                        String coverImageUrl,
-                        String content) {
+                        Integer page,
+                        String language,
+                        String category,
+                        LocalDate publishedAt,
+                        LocalDate createdAt,
+                        String coverImage,
+                        String excerpt) {
 
     public static ReviewDto of(BookReviewEntity bookReviewEntity) {
         return new ReviewDto(bookReviewEntity.getId(),
+            bookReviewEntity.getAdminUserId(),
             bookReviewEntity.getTitle(),
             bookReviewEntity.getAuthor(),
             bookReviewEntity.getRating(),
-            LocalDate.ofInstant(bookReviewEntity.getReviewDate(), ZoneOffset.UTC),
-            bookReviewEntity.getCoverImageUrl(),
-            bookReviewEntity.getContentHtml());
+            bookReviewEntity.getPage(),
+            bookReviewEntity.getLanguage(),
+            bookReviewEntity.getCategory(),
+            LocalDate.ofInstant(bookReviewEntity.getPublishedAt(), ZoneOffset.UTC),
+            LocalDate.ofInstant(bookReviewEntity.getCreatedAt(), ZoneOffset.UTC),
+            bookReviewEntity.getCoverImage(),
+            bookReviewEntity.getExcerpt());
     }
 
 }

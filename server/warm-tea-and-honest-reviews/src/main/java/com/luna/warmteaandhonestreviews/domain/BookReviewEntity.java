@@ -14,9 +14,12 @@ public class BookReviewEntity extends BaseEntity {
     private String title;
     private String author;
     private Double rating;
-    private Instant reviewDate;
-    private String coverImageUrl;
-    private String contentHtml;
+    private Integer page;
+    private String language;
+    private String category;
+    private Instant publishedAt;
+    private String coverImage;
+    private String excerpt;
 
 
     public BookReviewEntity() {
@@ -26,10 +29,23 @@ public class BookReviewEntity extends BaseEntity {
         String title,
         String author,
         Double rating,
-        Instant reviewDate,
-        String coverImageUrl,
-        String contentHtml) {
-        this(null, adminUserId, title, author, rating, reviewDate, coverImageUrl, contentHtml);
+        Integer page,
+        String language,
+        String category,
+        Instant publishedAt,
+        String coverImage,
+        String excerpt) {
+        this(null,
+            adminUserId,
+            title,
+            author,
+            rating,
+            page,
+            language,
+            category,
+            publishedAt,
+            coverImage,
+            excerpt);
     }
 
     public BookReviewEntity(String id,
@@ -37,17 +53,23 @@ public class BookReviewEntity extends BaseEntity {
         String title,
         String author,
         Double rating,
-        Instant reviewDate,
-        String coverImageUrl,
-        String contentHtml) {
+        Integer page,
+        String language,
+        String category,
+        Instant publishedAt,
+        String coverImage,
+        String excerpt) {
         this.id = id;
         this.adminUserId = adminUserId;
         this.title = title;
         this.author = author;
         this.rating = rating;
-        this.reviewDate = reviewDate;
-        this.coverImageUrl = coverImageUrl;
-        this.contentHtml = contentHtml;
+        this.page = page;
+        this.language = language;
+        this.category = category;
+        this.publishedAt = publishedAt;
+        this.coverImage = coverImage;
+        this.excerpt = excerpt;
     }
 
     public String getId() {
@@ -70,41 +92,28 @@ public class BookReviewEntity extends BaseEntity {
         return rating;
     }
 
-    public Instant getReviewDate() {
-        return reviewDate;
+    public Integer getPage() {
+        return page;
     }
 
-    public String getCoverImageUrl() {
-        return coverImageUrl;
+    public String getLanguage() {
+        return language;
     }
 
-    public String getContentHtml() {
-        return contentHtml;
+    public String getCategory() {
+        return category;
     }
 
-
-    public void setTitle(String title) {
-        this.title = title;
+    public Instant getPublishedAt() {
+        return publishedAt;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public String getCoverImage() {
+        return coverImage;
     }
 
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
-
-    public void setReviewDate(Instant reviewDate) {
-        this.reviewDate = reviewDate;
-    }
-
-    public void setCoverImageUrl(String coverImageUrl) {
-        this.coverImageUrl = coverImageUrl;
-    }
-
-    public void setContentHtml(String contentHtml) {
-        this.contentHtml = contentHtml;
+    public String getExcerpt() {
+        return excerpt;
     }
 
     @Override
@@ -130,9 +139,12 @@ public class BookReviewEntity extends BaseEntity {
             ", title='" + title + '\'' +
             ", author='" + author + '\'' +
             ", rating=" + rating +
-            ", reviewData=" + reviewDate +
-            ", coverImageUrl='" + coverImageUrl + '\'' +
-            ", contentHtml='" + contentHtml + '\'' +
+            ", page=" + page +
+            ", language='" + language + '\'' +
+            ", category='" + category + '\'' +
+            ", publishedAt=" + publishedAt +
+            ", coverImage='" + coverImage + '\'' +
+            ", excerpt='" + excerpt + '\'' +
             "} " + super.toString();
     }
 }

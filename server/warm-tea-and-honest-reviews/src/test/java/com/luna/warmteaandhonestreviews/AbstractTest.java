@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
-public class AbstracTest {
+public class AbstractTest {
 
     public static AdminUserEntity adminUser1 = new AdminUserEntity(UUID.randomUUID().toString(),
         "test1",
@@ -15,14 +15,20 @@ public class AbstracTest {
         "title1",
         "author1",
         4.3,
+        300,
+        "English",
+        "Fiction",
         LocalDateTime.now().toInstant(ZoneOffset.UTC),
         "/image1",
-        "html1");
+        "test");
     public static BookReviewEntity bookReview2 = new BookReviewEntity(adminUser1.getId(),
         "title2",
         "author2",
         4.0,
+        200,
+        "English",
+        "Romance",
         LocalDateTime.now().toInstant(ZoneOffset.UTC),
         "/image2",
-        "html2");
+        "test2");
 }

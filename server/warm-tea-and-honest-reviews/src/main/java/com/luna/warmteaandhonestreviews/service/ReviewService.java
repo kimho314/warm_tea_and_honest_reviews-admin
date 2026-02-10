@@ -3,9 +3,12 @@ package com.luna.warmteaandhonestreviews.service;
 import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import com.luna.warmteaandhonestreviews.dto.GetReviewsRespDto;
 import com.luna.warmteaandhonestreviews.dto.ReviewDto;
+import com.luna.warmteaandhonestreviews.dto.SaveReviewReqDto;
+import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
 import com.luna.warmteaandhonestreviews.exception.ReviewNotFoundException;
 import com.luna.warmteaandhonestreviews.repository.BookReviewRepository;
 import java.util.List;
+import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,5 +46,14 @@ public class ReviewService {
             adminUsers.getTotalElements(),
             adminUsers.getNumber(),
             adminUsers.getSize());
+    }
+
+    public SaveReviewRespDto save(SaveReviewReqDto saveReviewReqDto) {
+        BookReviewEntity saved = bookReviewRepository.save(saveReviewReqDto.toEntity());
+        return new SaveReviewRespDto(saved.getId());
+    }
+
+    public Optional<ReviewDto> getByTitle(@NonNull String title) {
+        return bookReviewRepository.findByTitle(title).map(ReviewDto::of);
     }
 }
