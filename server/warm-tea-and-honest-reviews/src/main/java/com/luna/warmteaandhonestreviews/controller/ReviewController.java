@@ -70,10 +70,11 @@ public class ReviewController {
         }
 
         // need to get admin user info
-
+        String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
         storageService.store(file);
         SaveReviewRespDto resp = reviewService.save(
-            new SaveReviewReqDto("162a59e1-571f-42a3-a41a-edc83b03618a",
+            new SaveReviewReqDto(
+                adminUserId,
                 title,
                 author,
                 rating,
