@@ -3,6 +3,7 @@ package com.luna.warmteaandhonestreviews.controller;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -12,18 +13,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.luna.warmteaandhonestreviews.dto.GetReviewsRespDto;
 import com.luna.warmteaandhonestreviews.dto.ReviewDto;
+import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
 import com.luna.warmteaandhonestreviews.service.ReviewService;
 import com.luna.warmteaandhonestreviews.service.StorageService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -32,6 +38,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(RestDocumentationExtension.class)
@@ -50,7 +57,8 @@ public class ReviewControllerTest {
         RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(documentationConfiguration(restDocumentation))
-            .alwaysDo(document("{method-name}", preprocessRequest(prettyPrint()),
+            .alwaysDo(document("{method-name}",
+                preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint())))
             .build();
     }
@@ -89,14 +97,27 @@ public class ReviewControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(
-            get("/api/reviews/{id}", id).accept(MediaType.APPLICATION_JSON));
+            get("/api/reviews/{id}", id).contentType(MediaType.APPLICATION_JSON));
 
         // then
         perform
             .andExpect(status().isOk())
-            .andDo(document("getReview",
+            .andDo(document("{method-name}",
                 preprocessRequest(prettyPrint()),
-                preprocessResponse(prettyPrint())));
+                preprocessResponse(prettyPrint()),
+                responseFields(fieldWithPath("id").description("review id"),
+                    fieldWithPath("adminUserId").description("review admin user id"),
+                    fieldWithPath("title").description("review title"),
+                    fieldWithPath("author").description("review author"),
+                    fieldWithPath("rating").description("review rating"),
+                    fieldWithPath("page").description("review page"),
+                    fieldWithPath("language").description("review language"),
+                    fieldWithPath("category").description("review category"),
+                    fieldWithPath("publishedAt").description("review published at"),
+                    fieldWithPath("createdAt").description("review created at"),
+                    fieldWithPath("coverImage").description("review cover image"),
+                    fieldWithPath("excerpt").description("review excerpt"))
+            ));
     }
 
     @Test
@@ -142,12 +163,12 @@ public class ReviewControllerTest {
         params.add("page", page.toString());
         params.add("offset", offset.toString());
         ResultActions perform = mockMvc.perform(
-            get("/api/reviews").params(params).accept(MediaType.APPLICATION_JSON));
+            get("/api/reviews").params(params).contentType(MediaType.APPLICATION_JSON));
 
         // then
         perform
             .andExpect(status().isOk())
-            .andDo(document("getReviews",
+            .andDo(document("{method-name}",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 responseFields(
@@ -168,5 +189,48 @@ public class ReviewControllerTest {
                     fieldWithPath("page").description("Current page number"),
                     fieldWithPath("offset").description("Current offset")
                 )));
+    }
+
+    @Test
+    void createReviewTest() throws Exception {
+        // given
+        ClassPathResource resource = new ClassPathResource("IlkbaharRuyasi.jpg");
+        byte[] imageBytes = StreamUtils.copyToByteArray(resource.getInputStream());
+        MockMultipartFile cover = new MockMultipartFile("cover",
+            "IlkbaharRuyasi.jpg",
+            MediaType.IMAGE_JPEG_VALUE,
+            imageBytes);
+
+        Mockito.when(reviewService.getByTitle("test title"))
+            .thenReturn(Optional.empty());
+        Mockito.doNothing().when(storageService).store(cover);
+        Mockito.when(reviewService.save(Mockito.any()))
+            .thenReturn(new SaveReviewRespDto(UUID.randomUUID().toString()));
+
+        // when
+        ResultActions perform = mockMvc.perform(multipart("/api/reviews")
+            .file(cover)
+            .part(new MockPart("title", null, "test title".getBytes(), MediaType.APPLICATION_JSON))
+            .part(
+                new MockPart("author", null, "test author".getBytes(), MediaType.APPLICATION_JSON))
+            .part(new MockPart("rating", null, "4.5".getBytes(), MediaType.APPLICATION_JSON))
+            .part(new MockPart("page", null, "300".getBytes(), MediaType.APPLICATION_JSON))
+            .part(new MockPart("language", null, "English".getBytes(), MediaType.APPLICATION_JSON))
+            .part(new MockPart("category", null, "Fiction".getBytes(), MediaType.APPLICATION_JSON))
+            .part(new MockPart("publishedAt", null, "2021-08-01".getBytes(),
+                MediaType.APPLICATION_JSON))
+            .part(new MockPart("excerpt", null, "test excerpt".getBytes(),
+                MediaType.APPLICATION_JSON))
+        );
+
+        // then
+        perform
+            .andExpect(status().isOk())
+            .andDo(document("{method-name}",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(fieldWithPath("id").description("review id"))
+            ));
+
     }
 }
