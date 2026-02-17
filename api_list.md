@@ -112,13 +112,18 @@ POST /admin/reviews
 
 **Request (Multipart Form Data)**
 
-```
-title: string
-author: string
-rating: number (1–5)
-reviewDate: date
-coverImage: file (optional)
-content: string (HTML)
+```bash
+$ curl 'http://localhost:8080/admin/reviews' -i -X POST \
+    -H 'Content-Type: multipart/form-data' \
+    -F 'title=test title;type=application/json' \
+    -F 'author=test author;type=application/json' \
+    -F 'rating=4.5;type=application/json' \
+    -F 'page=300;type=application/json' \
+    -F 'language=English;type=application/json' \
+    -F 'category=Fiction;type=application/json' \
+    -F 'publishedAt=2021-08-01;type=application/json' \
+    -F 'excerpt=test excerpt;type=application/json' \
+    -F 'cover=@IlkbaharRuyasi.jpg;type=image/jpeg'
 ```
 
 **Server Behavior**
@@ -130,7 +135,17 @@ content: string (HTML)
 **Success Response**
 
 ```
-HTTP 201 Created
+HTTP 200 OK
+```
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 53
+
+{
+  "id" : "0f389622-7051-4472-baed-aa7117718c15"
+}
 ```
 
 **Failure Responses**
@@ -148,8 +163,15 @@ HTTP 201 Created
 
 **Endpoint**
 
+```bash
+GET /admin/reviews?page={page}&offset={offset}
 ```
-GET /api/reviews?page={page}&offset={offset}
+
+**Request**
+
+```bash
+$ curl 'http://localhost:8080/admin/reviews?page=1&offset=30' -i -X GET \
+    -H 'Content-Type: application/json'
 ```
 
 **Description**
@@ -164,21 +186,30 @@ GET /api/reviews?page={page}&offset={offset}
 
 **Response Example**
 
-```json
-[
-  {
-    "id": "ObjectId",
-    "title": "Atomic Habits",
-    "author": "James Clear",
-    "rating": 4,
-    "reviewDate": "2026-01-18",
-    "coverImageUrl": "/images/atomic-habits.jpg",
-    "content": "<p>This book explains...</p>",
-    "total": 100,
-    "page": 1,
-    "offset": 30
-  }
-]
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 490
+
+{
+  "reviews" : [ {
+    "id" : "b1e34854-66a7-40b8-8790-9dae5659fe0b",
+    "adminUserId" : "162a59e1-571f-42a3-a41a-edc83b03618a",
+    "title" : "test title",
+    "author" : "test author",
+    "rating" : 4.5,
+    "page" : 300,
+    "language" : "English",
+    "category" : "Fiction",
+    "publishedAt" : "2026-02-15",
+    "createdAt" : "2026-02-15",
+    "coverImage" : "test cover image",
+    "excerpt" : "test excerpt"
+  } ],
+  "total" : 2,
+  "page" : 1,
+  "offset" : 30
+}
 ```
 
 ---
@@ -188,7 +219,14 @@ GET /api/reviews?page={page}&offset={offset}
 **Endpoint**
 
 ```
-GET /api/reviews/{id}
+GET /admin/reviews/{id}
+```
+
+**Request**
+
+```bash
+$ curl 'http://localhost:8080/admin/reviews/6c4e703b-3f06-4718-81b1-59bfe0baf013' -i -X GET \
+    -H 'Content-Type: application/json'
 ```
 
 **Description**
@@ -201,15 +239,24 @@ GET /api/reviews/{id}
 
 **Response Example**
 
-```json
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 391
+
 {
-  "id": "ObjectId",
-  "title": "Atomic Habits",
-  "author": "James Clear",
-  "rating": 4,
-  "reviewDate": "2026-01-18",
-  "coverImageUrl": "/images/atomic-habits.jpg",
-  "content": "<p>This book explains...</p>"
+  "id" : "6c4e703b-3f06-4718-81b1-59bfe0baf013",
+  "adminUserId" : "162a59e1-571f-42a3-a41a-edc83b03618a",
+  "title" : "test title",
+  "author" : "test author",
+  "rating" : 4.5,
+  "page" : 300,
+  "language" : "English",
+  "category" : "Fiction",
+  "publishedAt" : "2026-02-15",
+  "createdAt" : "2026-02-15",
+  "coverImage" : "test cover image",
+  "excerpt" : "test excerpt"
 }
 ```
 
