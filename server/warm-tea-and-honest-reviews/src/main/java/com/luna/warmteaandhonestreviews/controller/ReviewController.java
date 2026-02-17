@@ -17,14 +17,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/reviews")
 public class ReviewController {
 
     private static final Logger log = LoggerFactory.getLogger(ReviewController.class);
@@ -36,13 +34,13 @@ public class ReviewController {
         this.storageService = storageService;
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/admin/reviews/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ReviewDto> getReview(@PathVariable(value = "id") String id) {
         return ResponseEntity.ok(
             reviewService.getReview("162a59e1-571f-42a3-a41a-edc83b03618a", id));
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/admin/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetReviewsRespDto> getReviews(
         @NonNull @RequestParam(defaultValue = "0") Integer page,
         @NonNull @RequestParam(defaultValue = "30") Integer offset) {
@@ -50,7 +48,7 @@ public class ReviewController {
             reviewService.getReviews("162a59e1-571f-42a3-a41a-edc83b03618a", page, offset));
     }
 
-    @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+    @PostMapping(value = "/admin/reviews", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
         MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SaveReviewRespDto> createReview(@RequestPart("cover") MultipartFile file,
         @RequestPart("title") String title,

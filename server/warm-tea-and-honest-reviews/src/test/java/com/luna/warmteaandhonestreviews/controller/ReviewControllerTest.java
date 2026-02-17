@@ -97,7 +97,7 @@ public class ReviewControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(
-            get("/api/reviews/{id}", id).contentType(MediaType.APPLICATION_JSON));
+            get("/admin/reviews/{id}", id).contentType(MediaType.APPLICATION_JSON));
 
         // then
         perform
@@ -163,7 +163,7 @@ public class ReviewControllerTest {
         params.add("page", page.toString());
         params.add("offset", offset.toString());
         ResultActions perform = mockMvc.perform(
-            get("/api/reviews").params(params).contentType(MediaType.APPLICATION_JSON));
+            get("/admin/reviews").params(params).contentType(MediaType.APPLICATION_JSON));
 
         // then
         perform
@@ -208,7 +208,7 @@ public class ReviewControllerTest {
             .thenReturn(new SaveReviewRespDto(UUID.randomUUID().toString()));
 
         // when
-        ResultActions perform = mockMvc.perform(multipart("/api/reviews")
+        ResultActions perform = mockMvc.perform(multipart("/admin/reviews")
             .file(cover)
             .part(new MockPart("title", null, "test title".getBytes(), MediaType.APPLICATION_JSON))
             .part(
