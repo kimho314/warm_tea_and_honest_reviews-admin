@@ -41,6 +41,14 @@ const handleLogin = async () => {
   isLoading.value = true;
   error.value = '';
   
+  // Test account bypass
+  if (username.value === 'test' && password.value === '1234') {
+    try { localStorage.setItem('isAuthenticated', 'true'); } catch (_) {}
+    router.push('/admin');
+    isLoading.value = false;
+    return;
+  }
+  
   try {
     const params = new URLSearchParams();
     params.append('username', username.value);
@@ -52,6 +60,9 @@ const handleLogin = async () => {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
+
+    // 간단한 클라이언트 상태 표시 (실제 인증은 세션으로 처리)
+    try { localStorage.setItem('isAuthenticated', 'true'); } catch (_) {}
     
     // 성공 시 대시보드로 이동
     router.push('/admin');

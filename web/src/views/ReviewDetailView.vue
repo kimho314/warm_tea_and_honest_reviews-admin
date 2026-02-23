@@ -13,15 +13,20 @@
           <h2>{{ review.title }}</h2>
           <p><strong>Author:</strong> {{ review.author }}</p>
           <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
-          <p><strong>Date:</strong> {{ review.reviewDate }}</p>
-          <div v-if="review.coverImageUrl" style="margin-top: 1rem;">
-            <img :src="review.coverImageUrl" alt="Cover Image" style="max-width: 200px; border: 1px solid #ddd;" />
+          <p><strong>Date:</strong> {{ review.publishedAt || review.createdAt }}</p>
+          <div v-if="review.coverImage" style="margin-top: 1rem;">
+            <img :src="review.coverImage" alt="Cover Image" style="max-width: 200px; border: 1px solid #ddd;" />
           </div>
         </section>
 
         <section class="form-section">
+          <h3>Excerpt</h3>
+          <div class="review-content">{{ review.excerpt }}</div>
+        </section>
+
+        <section v-if="review.content" class="form-section">
           <h3>Content</h3>
-          <div v-html="review.content" class="review-content"></div>
+          <div class="review-content ql-editor" v-html="review.content"></div>
         </section>
 
         <div class="form-actions">
@@ -35,6 +40,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import api from '../api';
 
 const route = useRoute();
@@ -45,7 +51,9 @@ const error = ref(null);
 
 const fetchReview = async () => {
   try {
-    const response = await api.get(`/api/reviews/${route.params.id}`);
+    console.log('review id:', route.params.id)
+    const response = await api.get(`/admin/reviews/${route.params.id}`);
+    console.log('review response data:', response.data);
     review.value = response.data;
   } catch (err) {
     console.error('Failed to fetch review:', err);
@@ -60,6 +68,7 @@ onMounted(fetchReview);
 const handleLogout = async () => {
   try {
     await api.post('/admin/logout');
+    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
     router.push('/admin/login');
   } catch (err) {
     router.push('/admin/login');

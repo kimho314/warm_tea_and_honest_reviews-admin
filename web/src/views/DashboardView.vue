@@ -30,7 +30,7 @@
                 <td style="padding: 0.5rem;">{{ review.title }}</td>
                 <td style="padding: 0.5rem;">{{ review.author }}</td>
                 <td style="padding: 0.5rem;">{{ review.rating }} / 5</td>
-                <td style="padding: 0.5rem;">{{ review.reviewDate }}</td>
+                <td style="padding: 0.5rem;">{{ review.publishedAt || review.createdAt }}</td>
                 <td style="padding: 0.5rem;">
                   <router-link :to="'/admin/reviews/' + review.id">View</router-link>
                 </td>
@@ -78,20 +78,20 @@ const offset = 30;
 const fetchReviews = async (page = 1) => {
   loading.value = true;
   try {
-    const response = await api.get(`/api/reviews?page=${page}&offset=${offset}`);
-    reviews.value = response.data;
-    
-    if (response.data.length > 0) {
-      totalCount.value = response.data[0].total || 0;
-      currentPage.value = response.data[0].page || page;
-      totalPages.value = Math.ceil(totalCount.value / offset) || 1;
-    } else {
-      totalCount.value = 0;
-      currentPage.value = page;
-      totalPages.value = 1;
-    }
+    const response = await api.get(`/admin/reviews?page=${page-1}&offset=${offset}`);
+    const data = response.data;
+
+    // API 형식: { reviews: [...], total, page, offset }
+    reviews.value = Array.isArray(data?.reviews) ? data.reviews : [];
+    totalCount.value = Number(data?.total || 0);
+    currentPage.value = Number(data?.page || page);
+    totalPages.value = Math.max(1, Math.ceil(totalCount.value / offset));
   } catch (err) {
     console.error('Failed to fetch reviews:', err);
+    reviews.value = [];
+    totalCount.value = 0;
+    currentPage.value = page;
+    totalPages.value = 1;
   } finally {
     loading.value = false;
   }
@@ -108,10 +108,12 @@ onMounted(() => fetchReviews(1));
 const handleLogout = async () => {
   try {
     await api.post('/admin/logout');
+    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
     router.push('/admin/login');
   } catch (err) {
     console.error('Logout failed:', err);
     // 세션이 이미 만료된 경우에도 로그인 페이지로 이동
+    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
     router.push('/admin/login');
   }
 };

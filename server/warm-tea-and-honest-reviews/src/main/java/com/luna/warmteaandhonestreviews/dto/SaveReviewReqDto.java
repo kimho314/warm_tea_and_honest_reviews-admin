@@ -13,7 +13,8 @@ public record SaveReviewReqDto(String adminUserId,
                                String category,
                                LocalDate publishedAt,
                                String excerpt,
-                               String coverImage) {
+                               String coverImage,
+                               String contents) {
 
     public BookReviewEntity toEntity() {
         return new BookReviewEntity(adminUserId,
@@ -25,6 +26,7 @@ public record SaveReviewReqDto(String adminUserId,
             category,
             publishedAt.atStartOfDay(ZoneOffset.UTC).toInstant(),
             coverImage,
+            contents,
             excerpt);
     }
 }

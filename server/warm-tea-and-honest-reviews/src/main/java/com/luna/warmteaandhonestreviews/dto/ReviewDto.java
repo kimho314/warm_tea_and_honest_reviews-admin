@@ -15,7 +15,8 @@ public record ReviewDto(String id,
                         LocalDate publishedAt,
                         LocalDate createdAt,
                         String coverImage,
-                        String excerpt) {
+                        String excerpt,
+                        String content) {
 
     public static ReviewDto of(BookReviewEntity bookReviewEntity) {
         return new ReviewDto(bookReviewEntity.getId(),
@@ -29,7 +30,8 @@ public record ReviewDto(String id,
             LocalDate.ofInstant(bookReviewEntity.getPublishedAt(), ZoneOffset.UTC),
             LocalDate.ofInstant(bookReviewEntity.getCreatedAt(), ZoneOffset.UTC),
             bookReviewEntity.getCoverImage(),
-            bookReviewEntity.getExcerpt());
+            bookReviewEntity.getExcerpt(),
+            bookReviewEntity.getContents());
     }
 
 }

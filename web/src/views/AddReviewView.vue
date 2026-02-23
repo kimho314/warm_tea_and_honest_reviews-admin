@@ -11,48 +11,63 @@
           <h2>Metadata</h2>
 
           <label>
-            Book Title
+            Book Title <span style="color: red;">*</span>
             <input type="text" v-model="form.title" required />
           </label>
 
           <label>
-            Author
+            Author <span style="color: red;">*</span>
             <input type="text" v-model="form.author" required />
           </label>
 
           <label>
-            Rating (1–5)
-            <input type="number" v-model.number="form.rating" min="1" max="5" required />
+            Rating (1–5) <span style="color: red;">*</span>
+            <input type="number" v-model.number="form.rating" min="1" max="5" step="0.1" required />
           </label>
 
           <label>
-            Review Date
-            <input type="date" v-model="form.reviewDate" required />
+            Page Count <span style="color: red;">*</span>
+            <input type="number" v-model.number="form.page" min="1" required />
           </label>
 
           <label>
-            Cover Image
-            <input type="file" @change="handleFileChange($event, 'coverImage')" accept="image/*" />
+            Language <span style="color: red;">*</span>
+            <input type="text" v-model="form.language" required />
+          </label>
+
+          <label>
+            Category <span style="color: red;">*</span>
+            <input type="text" v-model="form.category" required />
+          </label>
+
+          <label>
+            Published At <span style="color: red;">*</span>
+            <input type="date" v-model="form.publishedAt" required />
+          </label>
+
+          <label>
+            Cover Image <span style="color: red;">*</span>
+            <input type="file" @change="handleFileChange($event, 'cover')" accept="image/*" required />
           </label>
         </section>
 
         <section class="form-section">
-          <h2>Review Content</h2>
-
+          <h2>Excerpt</h2>
           <label>
-            Word File (optional)
-            <input type="file" @change="handleFileChange($event, 'docFile')" accept=".doc,.docx" />
+            <textarea v-model="form.excerpt" rows="8"></textarea>
           </label>
+        </section>
 
+        <section class="form-section">
+          <h2>Content <span style="color: red;">*</span></h2>
           <label>
-            Review Content (HTML)
-            <textarea v-model="form.content" rows="12"></textarea>
+            <QuillEditor v-model:content="form.content" contentType="html" theme="snow" style="height: 300px;" />
           </label>
         </section>
 
         <div class="form-actions">
           <button type="button" @click="router.back()" style="margin-right: 1rem;">Cancel</button>
-          <button type="submit" :disabled="isSubmitting">
+          <button type="submit" :disabled="isSubmitting || !isFormValid">
             {{ isSubmitting ? 'Publishing...' : 'Publish Review' }}
           </button>
         </div>
@@ -62,21 +77,43 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import api from '../api';
 
 const router = useRouter();
 const isSubmitting = ref(false);
 
+const today = new Date().toISOString().split('T')[0];
+
 const form = reactive({
   title: '',
   author: '',
   rating: 5,
-  reviewDate: new Date().toISOString().split('T')[0],
+  page: 0,
+  language: '',
+  category: '',
+  publishedAt: today,
+  excerpt: '',
   content: '',
-  coverImage: null,
-  docFile: null
+  cover: null
+});
+
+const isFormValid = computed(() => {
+  return (
+    form.title.trim() !== '' &&
+    form.author.trim() !== '' &&
+    form.rating >= 1 && form.rating <= 5 &&
+    form.page > 0 &&
+    form.language.trim() !== '' &&
+    form.category.trim() !== '' &&
+    form.publishedAt !== '' &&
+    form.content.trim() !== '' &&
+    form.content !== '' && // Quill empty content check
+    form.cover !== null
+  );
 });
 
 const handleFileChange = (event, field) => {
@@ -88,20 +125,21 @@ const handleSubmit = async () => {
   
   try {
     const formData = new FormData();
-    formData.append('title', form.title);
-    formData.append('author', form.author);
-    formData.append('rating', form.rating);
-    formData.append('reviewDate', form.reviewDate);
-    formData.append('content', form.content);
+    // FormData에 각 필드를 추가할 때, API 명세에 맞춰 Content-Type을 application/json으로 설정하기 위해 Blob을 사용합니다.
+    // Blob 생성자의 첫 번째 인자는 배열 형태여야 합니다.
+    formData.append('title', new Blob([form.title], { type: 'application/json' }));
+    formData.append('author', new Blob([form.author], { type: 'application/json' }));
+    formData.append('rating', new Blob([form.rating], { type: 'application/json' }));
     
-    if (form.coverImage) {
-      formData.append('coverImage', form.coverImage);
-    }
+    formData.append('page', new Blob([form.page], { type: 'application/json' }));
+    formData.append('language', new Blob([form.language], { type: 'application/json' }));
+    formData.append('category', new Blob([form.category], { type: 'application/json' }));
+
+    formData.append('publishedAt', new Blob([form.publishedAt], { type: 'application/json' }));
+    formData.append('excerpt', new Blob([form.excerpt], { type: 'application/json' }));
+    formData.append('content', new Blob([form.content], { type: 'application/json' }));
     
-    if (form.docFile) {
-      // API 명세에는 명시되어 있지 않지만 HTML 폼에 존재하므로 포함
-      formData.append('docFile', form.docFile);
-    }
+    formData.append('cover', form.cover);
 
     await api.post('/admin/reviews', formData, {
       headers: {
@@ -122,6 +160,7 @@ const handleSubmit = async () => {
 const handleLogout = async () => {
   try {
     await api.post('/admin/logout');
+    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
     router.push('/admin/login');
   } catch (err) {
     router.push('/admin/login');

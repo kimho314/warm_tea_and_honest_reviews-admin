@@ -20,7 +20,8 @@ public class AbstractTest {
         "Fiction",
         LocalDateTime.now().toInstant(ZoneOffset.UTC),
         "/image1",
-        "test");
+        "contents1",
+        "excerpt1");
     public static BookReviewEntity bookReview2 = new BookReviewEntity(adminUser1.getId(),
         "title2",
         "author2",
@@ -30,5 +31,6 @@ public class AbstractTest {
         "Romance",
         LocalDateTime.now().toInstant(ZoneOffset.UTC),
         "/image2",
-        "test2");
+        "contents2",
+        "excerpt2");
 }

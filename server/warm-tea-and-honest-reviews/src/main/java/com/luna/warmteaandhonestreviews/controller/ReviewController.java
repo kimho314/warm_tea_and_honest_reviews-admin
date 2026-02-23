@@ -48,8 +48,7 @@ public class ReviewController {
             reviewService.getReviews("162a59e1-571f-42a3-a41a-edc83b03618a", page, offset));
     }
 
-    @PostMapping(value = "/admin/reviews", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
-        MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/admin/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SaveReviewRespDto> createReview(@RequestPart("cover") MultipartFile file,
         @RequestPart("title") String title,
         @RequestPart("author") String author,
@@ -57,11 +56,10 @@ public class ReviewController {
         @RequestPart("page") Integer page,
         @RequestPart("language") String language,
         @RequestPart("category") String category,
+        @RequestPart("content") String contents,
         @RequestPart("publishedAt") @DateTimeFormat(pattern = "yyyy-MM-dd") String publishedAt,
         @RequestPart(value = "excerpt", required = false) String excerpt) {
-        log.info(
-            "create review. title: {}, author: {}, rating: {}, page: {}, language: {}, category: {}, publishedAt: {}, excerpt: {}",
-            title, author, rating, page, language, category, publishedAt, excerpt);
+
         Optional<ReviewDto> maybeReview = reviewService.getByTitle(title);
         if (maybeReview.isPresent()) {
             return ResponseEntity.ok(new SaveReviewRespDto(maybeReview.get().id()));
@@ -81,7 +79,9 @@ public class ReviewController {
                 category,
                 LocalDate.parse(publishedAt),
                 excerpt,
-                file.getOriginalFilename())
+                file.getOriginalFilename(),
+                contents
+            )
         );
         return ResponseEntity.ok(resp);
     }

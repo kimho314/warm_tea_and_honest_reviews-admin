@@ -19,6 +19,7 @@ public class BookReviewEntity extends BaseEntity {
     private String category;
     private Instant publishedAt;
     private String coverImage;
+    private String contents;
     private String excerpt;
 
 
@@ -34,6 +35,7 @@ public class BookReviewEntity extends BaseEntity {
         String category,
         Instant publishedAt,
         String coverImage,
+        String contents,
         String excerpt) {
         this(null,
             adminUserId,
@@ -45,6 +47,7 @@ public class BookReviewEntity extends BaseEntity {
             category,
             publishedAt,
             coverImage,
+            contents,
             excerpt);
     }
 
@@ -58,6 +61,7 @@ public class BookReviewEntity extends BaseEntity {
         String category,
         Instant publishedAt,
         String coverImage,
+        String contents,
         String excerpt) {
         this.id = id;
         this.adminUserId = adminUserId;
@@ -69,6 +73,7 @@ public class BookReviewEntity extends BaseEntity {
         this.category = category;
         this.publishedAt = publishedAt;
         this.coverImage = coverImage;
+        this.contents = contents;
         this.excerpt = excerpt;
     }
 
@@ -114,6 +119,10 @@ public class BookReviewEntity extends BaseEntity {
 
     public String getExcerpt() {
         return excerpt;
+    }
+
+    public String getContents() {
+        return contents;
     }
 
     @Override

@@ -74,30 +74,31 @@ mock.onPost('/admin/reviews').reply(config => {
 });
 
 // 4.1 Get All Book Reviews
-mock.onGet(/\/api\/reviews(\?.*)?/).reply(config => {
-  console.log('Mock GET /api/reviews called', config.url);
+mock.onGet(/\/admin\/reviews(\?.*)?/).reply(config => {
+  console.log('Mock GET /admin/reviews called', config.url);
   const url = config.url.includes('?') ? config.url : config.url + '?';
   const params = new URLSearchParams(url.split('?')[1]);
-  const page = parseInt(params.get('page')) || 1;
+  const page = parseInt(params.get('page')) || 0;
   const offset = parseInt(params.get('offset')) || 30;
 
-  const start = (page - 1) * offset;
+  const start = page * offset;
   const end = start + offset;
   const paginatedReviews = reviews.slice(start, end);
 
-  const response = paginatedReviews.map(r => ({
-    ...r,
+  const response = {
+    reviews: paginatedReviews,
     total: reviews.length,
     page: page,
     offset: offset
-  }));
+  };
 
   return [200, response];
 });
 
 // 4.2 Get Book Review Detail
-mock.onGet(/\/api\/reviews\/\d+/).reply(config => {
+mock.onGet(/\/admin\/reviews\/[a-zA-Z0-9-]+/).reply(config => {
   const id = config.url.split('/').pop();
+  console.log('Mock GET /admin/reviews detail called', id);
   const review = reviews.find(r => r.id === id);
   return review ? [200, review] : [404, { message: 'Review not found' }];
 });
