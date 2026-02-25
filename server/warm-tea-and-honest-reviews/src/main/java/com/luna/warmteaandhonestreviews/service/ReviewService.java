@@ -30,6 +30,13 @@ public class ReviewService {
                 () -> new ReviewNotFoundException("Review not found with id: " + reviewId));
     }
 
+    public ReviewDto getReviewImage(@NonNull String adminUserId, @NonNull String reviewId) {
+        return bookReviewRepository.findByAdminUserIdAndId(adminUserId, reviewId)
+            .map(ReviewDto::of)
+            .orElseThrow(
+                () -> new ReviewNotFoundException("Review not found with id: " + reviewId));
+    }
+
     public GetReviewsRespDto getReviews(@NonNull String adminUserId,
         @NonNull Integer page,
         @NonNull Integer offset) {

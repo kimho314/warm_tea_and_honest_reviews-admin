@@ -1,5 +1,8 @@
 package com.luna.warmteaandhonestreviews.controller;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -27,6 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
@@ -78,6 +82,7 @@ public class ReviewControllerTest {
         LocalDate createdAt = LocalDate.now();
         String coverImage = "test cover image";
         String excerpt = "test excerpt";
+        String content = "<html><h1>Hello</html>";
 
         Mockito.when(reviewService.getReview(adminUserID, id))
             .thenReturn(new ReviewDto(
@@ -92,7 +97,8 @@ public class ReviewControllerTest {
                 publishedAt,
                 createdAt,
                 coverImage,
-                excerpt
+                excerpt,
+                content
             ));
 
         // when
@@ -116,7 +122,8 @@ public class ReviewControllerTest {
                     fieldWithPath("publishedAt").description("review published at"),
                     fieldWithPath("createdAt").description("review created at"),
                     fieldWithPath("coverImage").description("review cover image"),
-                    fieldWithPath("excerpt").description("review excerpt"))
+                    fieldWithPath("excerpt").description("review excerpt"),
+                    fieldWithPath("content").description("review contents"))
             ));
     }
 
@@ -139,6 +146,7 @@ public class ReviewControllerTest {
         LocalDate createdAt = LocalDate.now();
         String coverImage = "test cover image";
         String excerpt = "test excerpt";
+        String content = "<html><h1>Hello</html>";
         ReviewDto review1 = new ReviewDto(id,
             adminUserId,
             title,
@@ -150,7 +158,8 @@ public class ReviewControllerTest {
             publishedAt,
             createdAt,
             coverImage,
-            excerpt);
+            excerpt,
+            content);
         reviewDtos.add(review1);
         Mockito.when(reviewService.getReviews(adminUserId, page, offset))
             .thenReturn(new GetReviewsRespDto(reviewDtos,
@@ -185,6 +194,7 @@ public class ReviewControllerTest {
                     fieldWithPath("reviews[].createdAt").description("An review's created at"),
                     fieldWithPath("reviews[].coverImage").description("An review's cover image"),
                     fieldWithPath("reviews[].excerpt").description("An review's excerpt"),
+                    fieldWithPath("reviews[].content").description("review contents"),
                     fieldWithPath("total").description("Total number of reviews"),
                     fieldWithPath("page").description("Current page number"),
                     fieldWithPath("offset").description("Current offset")
@@ -221,6 +231,8 @@ public class ReviewControllerTest {
                 MediaType.APPLICATION_JSON))
             .part(new MockPart("excerpt", null, "test excerpt".getBytes(),
                 MediaType.APPLICATION_JSON))
+            .part(new MockPart("content", null, "<html></html>".getBytes(),
+                MediaType.APPLICATION_JSON))
         );
 
         // then
@@ -232,5 +244,60 @@ public class ReviewControllerTest {
                 responseFields(fieldWithPath("id").description("review id"))
             ));
 
+    }
+
+    @Test
+    void getReviewImageTest() throws Exception {
+        //given
+        String id = UUID.randomUUID().toString();
+        String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
+        String title = "test title";
+        String author = "test author";
+        double rating = 4.5;
+        int bookPage = 300;
+        String language = "English";
+        String category = "Fiction";
+        LocalDate publishedAt = LocalDate.now();
+        LocalDate createdAt = LocalDate.now();
+        String coverImage = "test cover image";
+        String excerpt = "test excerpt";
+        String content = "<html><h1>Hello</html>";
+
+        Mockito.when(reviewService.getReviewImage(anyString(), anyString()))
+            .thenReturn(new ReviewDto(id,
+                adminUserId,
+                title,
+                author,
+                rating,
+                bookPage,
+                language,
+                category,
+                publishedAt,
+                createdAt,
+                coverImage,
+                excerpt,
+                content
+            ));
+        ClassPathResource classPathResource = new ClassPathResource("IlkbaharRuyasi.jpg");
+        Mockito.when(storageService.loadAsResource(anyString()))
+            .thenReturn(classPathResource);
+
+        //when
+        ResultActions perform = mockMvc.perform(get("/admin/reviews/{id}/image", id)
+            .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
+
+        //then
+        perform
+            .andExpect(status().isOk())
+            .andDo(document("{method-name}",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseHeaders(
+                    headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                        "The content type of the file"),
+                    headerWithName(HttpHeaders.CONTENT_DISPOSITION).description(
+                        "File download disposition and filename")
+                )
+            ));
     }
 }

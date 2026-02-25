@@ -11,7 +11,9 @@ import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,6 +86,21 @@ public class ReviewController {
             )
         );
         return ResponseEntity.ok(resp);
+    }
+
+
+    @GetMapping(value = "/admin/reviews/{id}/image", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> getImage(
+        @PathVariable("id") String id) {
+        // need to get admin user info
+        String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
+        ReviewDto review = reviewService.getReviewImage(adminUserId, id);
+
+        Resource resource = storageService.loadAsResource(review.coverImage());
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + resource.getFilename() + "\"")
+            .body(resource);
     }
 
 }
