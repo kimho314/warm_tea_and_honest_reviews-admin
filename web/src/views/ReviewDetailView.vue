@@ -14,8 +14,8 @@
           <p><strong>Author:</strong> {{ review.author }}</p>
           <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
           <p><strong>Date:</strong> {{ review.publishedAt || review.createdAt }}</p>
-          <div v-if="review.coverImage" style="margin-top: 1rem;">
-            <img :src="review.coverImage" alt="Cover Image" style="max-width: 200px; border: 1px solid #ddd;" />
+          <div v-if="coverImageUrl" style="margin-top: 1rem;">
+            <img :src="coverImageUrl" alt="Cover Image" style="max-width: 200px; border: 1px solid #ddd;" />
           </div>
         </section>
 
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import api from '../api';
@@ -48,13 +48,30 @@ const router = useRouter();
 const review = ref(null);
 const loading = ref(true);
 const error = ref(null);
+const coverImageUrl = ref('');
 
 const fetchReview = async () => {
   try {
-    console.log('review id:', route.params.id)
-    const response = await api.get(`/admin/reviews/${route.params.id}`);
+    const id = route.params.id;
+    console.log('review id:', id)
+    const response = await api.get(`/admin/reviews/${id}`);
     console.log('review response data:', response.data);
     review.value = response.data;
+
+    // Fetch image
+    try {
+      const imageResponse = await api.get(`/admin/reviews/${id}/image`, {
+        responseType: 'blob'
+      });
+      if (coverImageUrl.value) {
+        URL.revokeObjectURL(coverImageUrl.value);
+      }
+      coverImageUrl.value = URL.createObjectURL(imageResponse.data);
+    } catch (imageErr) {
+      console.error('Failed to fetch review image:', imageErr);
+      // Fallback to existing coverImage or placeholder if needed
+    }
+
   } catch (err) {
     console.error('Failed to fetch review:', err);
     error.value = 'Review not found.';
@@ -64,6 +81,12 @@ const fetchReview = async () => {
 };
 
 onMounted(fetchReview);
+
+onUnmounted(() => {
+  if (coverImageUrl.value) {
+    URL.revokeObjectURL(coverImageUrl.value);
+  }
+});
 
 const handleLogout = async () => {
   try {
