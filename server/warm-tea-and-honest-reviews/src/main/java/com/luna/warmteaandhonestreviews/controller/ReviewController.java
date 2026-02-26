@@ -16,6 +16,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -91,8 +93,11 @@ public class ReviewController {
 
     @GetMapping(value = "/admin/reviews/{id}/image", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getImage(
-        @PathVariable("id") String id) {
+        @PathVariable("id") String id,
+        @AuthenticationPrincipal UserDetails userDetails) {
         // need to get admin user info
+        log.info("name: {}, authority: {}", userDetails.getUsername(),
+            userDetails.getAuthorities());
         String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
         ReviewDto review = reviewService.getReviewImage(adminUserId, id);
 

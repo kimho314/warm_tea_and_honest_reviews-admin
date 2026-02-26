@@ -1,43 +1,61 @@
 package com.luna.warmteaandhonestreviews.domain;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-@Document(collection = "admin_users")
-public class AdminUserEntity extends BaseEntity {
+@Document(collection = "users")
+public class UserEntity extends BaseEntity implements UserDetails {
 
     @Id
     private String id;
     private String username;
     private String password;
+    private String role;
 
 
-    public AdminUserEntity() {
+    public UserEntity() {
     }
 
-    public AdminUserEntity(String username, String password) {
-        this(null, username, password);
+    public UserEntity(String username, String password, String role) {
+        this(null, username, password, role);
     }
 
-    public AdminUserEntity(String id, String username, String password) {
+
+    public UserEntity(String id, String username, String password, String role) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
     public String getId() {
         return id;
     }
 
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return username;
+    }
+
+
+    @Override
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     public String getPassword() {
         return password;
     }
 
+    public String getRole() {
+        return role;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -45,7 +63,7 @@ public class AdminUserEntity extends BaseEntity {
             return false;
         }
 
-        AdminUserEntity that = (AdminUserEntity) o;
+        UserEntity that = (UserEntity) o;
         return Objects.equals(id, that.id);
     }
 
@@ -54,12 +72,14 @@ public class AdminUserEntity extends BaseEntity {
         return Objects.hashCode(id);
     }
 
+
     @Override
     public String toString() {
-        return "AdminUserEntity{" +
+        return "UserEntity{" +
             "id='" + id + '\'' +
             ", username='" + username + '\'' +
             ", password='" + password + '\'' +
+            ", role='" + role + '\'' +
             "} " + super.toString();
     }
 }

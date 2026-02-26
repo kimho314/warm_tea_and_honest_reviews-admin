@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.luna.warmteaandhonestreviews.AbstractTest;
 import com.luna.warmteaandhonestreviews.config.MongoDBConfig;
-import com.luna.warmteaandhonestreviews.domain.AdminUserEntity;
 import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
+import com.luna.warmteaandhonestreviews.domain.UserEntity;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -53,7 +53,7 @@ public class BookReviewRepositoryTest {
     @Test
     void findByAdminUserIdTest() {
         // given
-        AdminUserEntity adminUser1 = AbstractTest.adminUser1;
+        UserEntity adminUser1 = AbstractTest.adminUser1;
 
         List<BookReviewEntity> list = new ArrayList<>();
         list.add(AbstractTest.bookReview1);

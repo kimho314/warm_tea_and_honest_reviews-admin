@@ -1,8 +1,11 @@
 package com.luna.warmteaandhonestreviews.repository;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.luna.warmteaandhonestreviews.auth.RoleEnum;
 import com.luna.warmteaandhonestreviews.config.MongoDBConfig;
-import com.luna.warmteaandhonestreviews.domain.AdminUserEntity;
+import com.luna.warmteaandhonestreviews.domain.UserEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -11,28 +14,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.mongodb.test.autoconfigure.DataMongoTest;
 import org.springframework.context.annotation.Import;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @Import(MongoDBConfig.class)
 @DataMongoTest
-public class AdminUserRepositoryTest {
+public class UserRepositoryTest {
 
-    private static final Logger log = LoggerFactory.getLogger(AdminUserRepositoryTest.class);
+    private static final Logger log = LoggerFactory.getLogger(UserRepositoryTest.class);
     @Autowired
-    AdminUserRepository adminUserRepository;
+    UserRepository userRepository;
 
     @AfterEach
     void tearDown() {
-        adminUserRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     void saveTest() {
         // given
-        AdminUserEntity userEntity = new AdminUserEntity("hoseopi", "1234");
+        UserEntity userEntity = new UserEntity("hoseopi", "1234", RoleEnum.ADMIN.name());
 
         // when
-        AdminUserEntity saved = adminUserRepository.save(userEntity);
+        UserEntity saved = userRepository.save(userEntity);
 
         // then
         assertThat(saved).isNotNull();

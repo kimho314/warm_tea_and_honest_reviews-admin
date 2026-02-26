@@ -8,12 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -24,7 +20,6 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
             // Spring Security should completely ignore URLs starting with /resources/
-            .requestMatchers(PathRequest.toH2Console())
             .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -47,23 +42,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        User.UserBuilder users = User.builder();
-        // NilKim:1234 | base64 -> encodedString=TmlsS2ltOjEyMzQ=
-        UserDetails user = users
-            .username("NilKim")
-            .password(passwordEncoder().encode("1234"))
-            .roles("ADMIN")
-            .build();
-        UserDetails user2 = users
-            .username("NilKim2")
-            .password(passwordEncoder().encode("1234"))
-            .roles("USER")
-            .build();
-
-        return new InMemoryUserDetailsManager(user, user2);
     }
 }
