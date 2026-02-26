@@ -1,6 +1,7 @@
 package com.luna.warmteaandhonestreviews.config;
 
 import com.luna.warmteaandhonestreviews.auth.CustomEntryPoint;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,7 +24,8 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
             // Spring Security should completely ignore URLs starting with /resources/
-            .requestMatchers("/resources/**");
+            .requestMatchers(PathRequest.toH2Console())
+            .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     @Bean
@@ -61,6 +63,7 @@ public class SecurityConfig {
             .password(passwordEncoder().encode("1234"))
             .roles("USER")
             .build();
+
         return new InMemoryUserDetailsManager(user, user2);
     }
 }
