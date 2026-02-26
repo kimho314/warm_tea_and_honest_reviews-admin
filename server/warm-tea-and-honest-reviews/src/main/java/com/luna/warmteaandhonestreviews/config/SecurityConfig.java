@@ -50,6 +50,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         User.UserBuilder users = User.builder();
+        // NilKim:1234 | base64 -> encodedString=TmlsS2ltOjEyMzQ=
         UserDetails user = users
             .username("NilKim")
             .password(passwordEncoder().encode("1234"))

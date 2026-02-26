@@ -12,6 +12,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.luna.warmteaandhonestreviews.dto.GetReviewsRespDto;
@@ -103,7 +104,9 @@ public class ReviewControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(
-            get("/admin/reviews/{id}", id).contentType(MediaType.APPLICATION_JSON));
+            get("/admin/reviews/{id}", id)
+                .with(httpBasic("NilKim", "1234"))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         perform
@@ -172,7 +175,10 @@ public class ReviewControllerTest {
         params.add("page", page.toString());
         params.add("offset", offset.toString());
         ResultActions perform = mockMvc.perform(
-            get("/admin/reviews").params(params).contentType(MediaType.APPLICATION_JSON));
+            get("/admin/reviews")
+                .params(params)
+                .with(httpBasic("NilKim", "1234"))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         perform
@@ -219,6 +225,7 @@ public class ReviewControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/admin/reviews")
+            .with(httpBasic("NilKim", "1234"))
             .file(cover)
             .part(new MockPart("title", null, "test title".getBytes(), MediaType.APPLICATION_JSON))
             .part(
@@ -284,6 +291,7 @@ public class ReviewControllerTest {
 
         //when
         ResultActions perform = mockMvc.perform(get("/admin/reviews/{id}/image", id)
+            .with(httpBasic("NilKim", "1234"))
             .contentType(MediaType.APPLICATION_OCTET_STREAM_VALUE));
 
         //then
