@@ -9,6 +9,7 @@ import com.luna.warmteaandhonestreviews.exception.ReviewNotFoundException;
 import com.luna.warmteaandhonestreviews.repository.BookReviewRepository;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,14 +25,16 @@ public class ReviewService {
     }
 
     public ReviewDto getReview(@NonNull String adminUserId, @NonNull String reviewId) {
-        return bookReviewRepository.findByAdminUserIdAndId(adminUserId, reviewId)
+        return bookReviewRepository.findByAdminUserIdAndId(new ObjectId(adminUserId),
+                new ObjectId(reviewId))
             .map(ReviewDto::of)
             .orElseThrow(
                 () -> new ReviewNotFoundException("Review not found with id: " + reviewId));
     }
 
     public ReviewDto getReviewImage(@NonNull String adminUserId, @NonNull String reviewId) {
-        return bookReviewRepository.findByAdminUserIdAndId(adminUserId, reviewId)
+        return bookReviewRepository.findByAdminUserIdAndId(new ObjectId(adminUserId),
+                new ObjectId(reviewId))
             .map(ReviewDto::of)
             .orElseThrow(
                 () -> new ReviewNotFoundException("Review not found with id: " + reviewId));
@@ -41,7 +44,7 @@ public class ReviewService {
         @NonNull Integer page,
         @NonNull Integer offset) {
         Page<BookReviewEntity> adminUsers = bookReviewRepository.findAllByAdminUserId(
-            adminUserId,
+            new ObjectId(adminUserId),
             PageRequest.of(page, offset)
         );
 

@@ -6,6 +6,7 @@ import com.luna.warmteaandhonestreviews.dto.SaveReviewReqDto;
 import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
 import com.luna.warmteaandhonestreviews.service.ReviewService;
 import com.luna.warmteaandhonestreviews.service.StorageService;
+import com.luna.warmteaandhonestreviews.service.UserService;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
@@ -32,28 +33,48 @@ public class ReviewController {
     private static final Logger log = LoggerFactory.getLogger(ReviewController.class);
     private final ReviewService reviewService;
     private final StorageService storageService;
+    private final UserService userService;
 
-    public ReviewController(ReviewService reviewService, StorageService storageService) {
+    public ReviewController(
+        ReviewService reviewService,
+        StorageService storageService,
+        UserService userService
+    ) {
         this.reviewService = reviewService;
         this.storageService = storageService;
+        this.userService = userService;
     }
 
     @GetMapping(value = "/admin/reviews/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReviewDto> getReview(@PathVariable(value = "id") String id) {
+    public ResponseEntity<ReviewDto> getReview(
+        @PathVariable(value = "id") String id,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         return ResponseEntity.ok(
-            reviewService.getReview("162a59e1-571f-42a3-a41a-edc83b03618a", id));
+            reviewService.getReview(
+                userService.getUserIdByUsername(userDetails.getUsername()),
+                id
+            )
+        );
     }
 
     @GetMapping(value = "/admin/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetReviewsRespDto> getReviews(
         @NonNull @RequestParam(defaultValue = "0") Integer page,
-        @NonNull @RequestParam(defaultValue = "30") Integer offset) {
+        @NonNull @RequestParam(defaultValue = "30") Integer offset,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         return ResponseEntity.ok(
-            reviewService.getReviews("162a59e1-571f-42a3-a41a-edc83b03618a", page, offset));
+            reviewService.getReviews(userService.getUserIdByUsername(userDetails.getUsername()),
+                page,
+                offset
+            )
+        );
     }
 
     @PostMapping(value = "/admin/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SaveReviewRespDto> createReview(@RequestPart("cover") MultipartFile file,
+    public ResponseEntity<SaveReviewRespDto> createReview(
+        @RequestPart("cover") MultipartFile file,
         @RequestPart("title") String title,
         @RequestPart("author") String author,
         @RequestPart("rating") Double rating,
@@ -62,15 +83,16 @@ public class ReviewController {
         @RequestPart("category") String category,
         @RequestPart("content") String contents,
         @RequestPart("publishedAt") @DateTimeFormat(pattern = "yyyy-MM-dd") String publishedAt,
-        @RequestPart(value = "excerpt", required = false) String excerpt) {
+        @RequestPart(value = "excerpt", required = false) String excerpt,
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
 
         Optional<ReviewDto> maybeReview = reviewService.getByTitle(title);
         if (maybeReview.isPresent()) {
             return ResponseEntity.ok(new SaveReviewRespDto(maybeReview.get().id()));
         }
 
-        // need to get admin user info
-        String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
+        String adminUserId = userService.getUserIdByUsername(userDetails.getUsername());
         storageService.store(file);
         SaveReviewRespDto resp = reviewService.save(
             new SaveReviewReqDto(
@@ -94,11 +116,11 @@ public class ReviewController {
     @GetMapping(value = "/admin/reviews/{id}/image", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getImage(
         @PathVariable("id") String id,
-        @AuthenticationPrincipal UserDetails userDetails) {
-        // need to get admin user info
+        @AuthenticationPrincipal UserDetails userDetails
+    ) {
         log.info("name: {}, authority: {}", userDetails.getUsername(),
             userDetails.getAuthorities());
-        String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
+        String adminUserId = userService.getUserIdByUsername(userDetails.getUsername());
         ReviewDto review = reviewService.getReviewImage(adminUserId, id);
 
         Resource resource = storageService.loadAsResource(review.coverImage());

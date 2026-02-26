@@ -20,6 +20,7 @@ import com.luna.warmteaandhonestreviews.dto.ReviewDto;
 import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
 import com.luna.warmteaandhonestreviews.service.ReviewService;
 import com.luna.warmteaandhonestreviews.service.StorageService;
+import com.luna.warmteaandhonestreviews.service.UserService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -48,6 +50,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(ReviewController.class)
+@WithMockUser(username = "NilKim", roles = "ADMIN", password = "1234")
 public class ReviewControllerTest {
 
     private MockMvc mockMvc;
@@ -56,6 +59,8 @@ public class ReviewControllerTest {
     ReviewService reviewService;
     @MockitoBean
     StorageService storageService;
+    @MockitoBean
+    UserService userService;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext,
@@ -101,6 +106,9 @@ public class ReviewControllerTest {
                 excerpt,
                 content
             ));
+
+        Mockito.when(userService.getUserIdByUsername(anyString()))
+            .thenReturn(adminUserID);
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -164,11 +172,14 @@ public class ReviewControllerTest {
             excerpt,
             content);
         reviewDtos.add(review1);
+
         Mockito.when(reviewService.getReviews(adminUserId, page, offset))
             .thenReturn(new GetReviewsRespDto(reviewDtos,
                 2L,
                 page,
                 offset));
+        Mockito.when(userService.getUserIdByUsername(anyString()))
+            .thenReturn(adminUserId);
 
         // when
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -215,13 +226,17 @@ public class ReviewControllerTest {
         MockMultipartFile cover = new MockMultipartFile("cover",
             "IlkbaharRuyasi.jpg",
             MediaType.IMAGE_JPEG_VALUE,
-            imageBytes);
+            imageBytes
+        );
+        String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
 
         Mockito.when(reviewService.getByTitle("test title"))
             .thenReturn(Optional.empty());
         Mockito.doNothing().when(storageService).store(cover);
         Mockito.when(reviewService.save(Mockito.any()))
             .thenReturn(new SaveReviewRespDto(UUID.randomUUID().toString()));
+        Mockito.when(userService.getUserIdByUsername(anyString()))
+            .thenReturn(adminUserId);
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/admin/reviews")
@@ -288,6 +303,8 @@ public class ReviewControllerTest {
         ClassPathResource classPathResource = new ClassPathResource("IlkbaharRuyasi.jpg");
         Mockito.when(storageService.loadAsResource(anyString()))
             .thenReturn(classPathResource);
+        Mockito.when(userService.getUserIdByUsername(anyString()))
+            .thenReturn(adminUserId);
 
         //when
         ResultActions perform = mockMvc.perform(get("/admin/reviews/{id}/image", id)

@@ -26,3 +26,13 @@ server:
 app:
   upload:
     dir: public/covers
+
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

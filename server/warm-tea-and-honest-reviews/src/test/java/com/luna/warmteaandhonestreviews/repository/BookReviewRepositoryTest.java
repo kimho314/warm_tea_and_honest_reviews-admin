@@ -8,6 +8,7 @@ import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import com.luna.warmteaandhonestreviews.domain.UserEntity;
 import java.util.ArrayList;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class BookReviewRepositoryTest {
         // when
         bookReviewRepository.saveAll(list);
         Page<BookReviewEntity> reviews = bookReviewRepository.findAllByAdminUserId(
-            adminUser1.getId(),
+            new ObjectId(adminUser1.getId()),
             PageRequest.of(0, 30));
 
         // then

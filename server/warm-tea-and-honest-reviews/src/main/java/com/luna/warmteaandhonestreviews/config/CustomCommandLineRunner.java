@@ -20,12 +20,14 @@ public class CustomCommandLineRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        userRepository.deleteAll();
-        UserEntity user1 = new UserEntity(
-            "NilKim",
-            passwordEncoder.encode("1234"),
-            RoleEnum.ADMIN.getRole()
-        );
-        userRepository.save(user1);
+        if (!userRepository.existsByUsername("NilKim")) {
+            userRepository.deleteAll();
+            UserEntity user1 = new UserEntity(
+                "NilKim",
+                passwordEncoder.encode("1234"),
+                RoleEnum.ADMIN.getRole()
+            );
+            userRepository.save(user1);
+        }
     }
 }
