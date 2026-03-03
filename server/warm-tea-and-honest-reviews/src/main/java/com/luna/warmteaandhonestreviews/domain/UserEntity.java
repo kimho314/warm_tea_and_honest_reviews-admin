@@ -3,6 +3,7 @@ package com.luna.warmteaandhonestreviews.domain;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import org.bson.types.ObjectId;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserEntity extends BaseEntity implements UserDetails {
 
     @Id
-    private String id;
+    private ObjectId id;
     private String username;
     private String password;
     private String role;
@@ -28,14 +29,14 @@ public class UserEntity extends BaseEntity implements UserDetails {
     }
 
 
-    public UserEntity(String id, String username, String password, String role) {
+    public UserEntity(ObjectId id, String username, String password, String role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 

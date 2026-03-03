@@ -5,12 +5,16 @@ import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import com.luna.warmteaandhonestreviews.domain.UserEntity;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.UUID;
+import org.bson.types.ObjectId;
 
 public class AbstractTest {
 
-    public static UserEntity adminUser1 = new UserEntity(UUID.randomUUID().toString(),
+    public static UserEntity adminUser1 = new UserEntity(ObjectId.get(),
         "test1",
+        "1234",
+        RoleEnum.ADMIN.getRole());
+    public static UserEntity adminUser2 = new UserEntity(ObjectId.get(),
+        "NilKim",
         "1234",
         RoleEnum.ADMIN.getRole());
     public static BookReviewEntity bookReview1 = new BookReviewEntity(adminUser1.getId(),

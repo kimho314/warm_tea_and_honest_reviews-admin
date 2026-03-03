@@ -60,7 +60,7 @@ public class ReviewService {
 
     public SaveReviewRespDto save(@NonNull SaveReviewReqDto saveReviewReqDto) {
         BookReviewEntity saved = bookReviewRepository.save(saveReviewReqDto.toEntity());
-        return new SaveReviewRespDto(saved.getId());
+        return new SaveReviewRespDto(saved.getId().toString());
     }
 
     public Optional<ReviewDto> getByTitle(@NonNull String title) {

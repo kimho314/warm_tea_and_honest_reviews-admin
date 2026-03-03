@@ -2,6 +2,7 @@ package com.luna.warmteaandhonestreviews.domain;
 
 import java.time.Instant;
 import java.util.Objects;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class BookReviewEntity extends BaseEntity {
 
     @Id
-    private String id;
-    private String adminUserId;
+    private ObjectId id;
+    private ObjectId adminUserId;
     private String title;
     private String author;
     private Double rating;
@@ -26,7 +27,7 @@ public class BookReviewEntity extends BaseEntity {
     public BookReviewEntity() {
     }
 
-    public BookReviewEntity(String adminUserId,
+    public BookReviewEntity(ObjectId adminUserId,
         String title,
         String author,
         Double rating,
@@ -51,8 +52,8 @@ public class BookReviewEntity extends BaseEntity {
             excerpt);
     }
 
-    public BookReviewEntity(String id,
-        String adminUserId,
+    public BookReviewEntity(ObjectId id,
+        ObjectId adminUserId,
         String title,
         String author,
         Double rating,
@@ -77,11 +78,11 @@ public class BookReviewEntity extends BaseEntity {
         this.excerpt = excerpt;
     }
 
-    public String getId() {
+    public ObjectId getId() {
         return id;
     }
 
-    public String getAdminUserId() {
+    public ObjectId getAdminUserId() {
         return adminUserId;
     }
 

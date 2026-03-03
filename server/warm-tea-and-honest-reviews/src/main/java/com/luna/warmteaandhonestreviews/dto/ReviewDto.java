@@ -19,8 +19,8 @@ public record ReviewDto(String id,
                         String content) {
 
     public static ReviewDto of(BookReviewEntity bookReviewEntity) {
-        return new ReviewDto(bookReviewEntity.getId(),
-            bookReviewEntity.getAdminUserId(),
+        return new ReviewDto(bookReviewEntity.getId().toString(),
+            bookReviewEntity.getAdminUserId().toString(),
             bookReviewEntity.getTitle(),
             bookReviewEntity.getAuthor(),
             bookReviewEntity.getRating(),

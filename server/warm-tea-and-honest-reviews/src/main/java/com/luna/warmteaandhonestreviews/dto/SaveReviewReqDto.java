@@ -3,6 +3,7 @@ package com.luna.warmteaandhonestreviews.dto;
 import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import org.bson.types.ObjectId;
 
 public record SaveReviewReqDto(String adminUserId,
                                String title,
@@ -17,7 +18,7 @@ public record SaveReviewReqDto(String adminUserId,
                                String contents) {
 
     public BookReviewEntity toEntity() {
-        return new BookReviewEntity(adminUserId,
+        return new BookReviewEntity(new ObjectId(adminUserId),
             title,
             author,
             rating,
