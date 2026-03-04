@@ -30,9 +30,12 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(basic -> basic.realmName("WTAH")
                 .authenticationEntryPoint(new CustomEntryPoint()))
+            .logout(logout -> logout.logoutUrl("/admin/logout").logoutSuccessUrl("/admin/login"))
             .authorizeHttpRequests(
                 authorize ->
-                    authorize.requestMatchers("/admin/**").hasRole("ADMIN")
+                    authorize
+                        .requestMatchers("/admin/login", "/admin/logout").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll()
             );
 

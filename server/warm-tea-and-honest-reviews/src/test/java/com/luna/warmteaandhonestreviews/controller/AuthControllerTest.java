@@ -63,7 +63,7 @@ public class AuthControllerTest {
             .thenReturn(Boolean.TRUE);
 
         //when
-        ResultActions perform = mockMvc.perform(post("/login")
+        ResultActions perform = mockMvc.perform(post("/admin/login")
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(new LoginReqDto(username, password))));
 

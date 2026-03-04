@@ -36,7 +36,8 @@ public class StorageServiceImpl implements StorageService {
         try {
             Files.createDirectories(location);
         } catch (IOException e) {
-            throw new StorageException("Could not initialize storage", e);
+            log.error("Could not initialize storage", e);
+//            throw new StorageException("Could not initialize storage", e);
         }
     }
 

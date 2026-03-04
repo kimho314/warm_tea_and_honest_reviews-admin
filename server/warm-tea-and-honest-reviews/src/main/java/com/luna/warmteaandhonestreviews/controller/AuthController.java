@@ -20,7 +20,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/admin/login")
     public ResponseEntity<Void> login(@RequestBody LoginReqDto loginReqDto) {
         boolean isLoggedIn = userService.login(loginReqDto.username(), loginReqDto.password());
         if (!isLoggedIn) {
