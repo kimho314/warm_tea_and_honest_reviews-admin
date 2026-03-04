@@ -37,14 +37,11 @@ reviews[1] = {
   content: '<p>A beautiful story about the choices that make up a life.</p>'
 };
 
-// 1.1 Login
-mock.onPost('/admin/login').reply(config => {
-  const params = new URLSearchParams(config.data);
-  const username = params.get('username');
-  const password = params.get('password');
+// 1.1 Login (Basic Auth style - JSON POST)
+mock.onPost('/login').reply(config => {
+  const { username, password } = JSON.parse(config.data);
 
-  if (username === 'test' && password === '1234') {
-    localStorage.setItem('isAuthenticated', 'true');
+  if ((username === 'test' && password === '1234') || (username === 'NilKim' && password === '1234')) {
     return [200, { message: 'Success' }];
   } else {
     return [401, { message: 'Invalid username or password' }];
@@ -54,6 +51,7 @@ mock.onPost('/admin/login').reply(config => {
 // 1.2 Logout
 mock.onPost('/admin/logout').reply(() => {
   localStorage.removeItem('isAuthenticated');
+  localStorage.removeItem('basicToken');
   return [200];
 });
 

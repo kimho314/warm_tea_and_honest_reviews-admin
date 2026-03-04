@@ -160,10 +160,17 @@ const handleSubmit = async () => {
 const handleLogout = async () => {
   try {
     await api.post('/admin/logout');
-    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
-    router.push('/admin/login');
+    try { 
+      localStorage.removeItem('isAuthenticated'); 
+      localStorage.removeItem('basicToken');
+    } catch (_) {}
+    router.push('/login');
   } catch (err) {
-    router.push('/admin/login');
+    try { 
+      localStorage.removeItem('isAuthenticated'); 
+      localStorage.removeItem('basicToken');
+    } catch (_) {}
+    router.push('/login');
   }
 };
 </script>

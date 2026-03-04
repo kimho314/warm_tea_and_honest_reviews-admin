@@ -39,30 +39,33 @@ const router = useRouter();
 
 const handleLogin = async () => {
   isLoading.value = true;
-  error.value = '';
+  // error.value = ''; // 다음 시도 시에도 이전 에러 메시지를 유지함
   
   // Test account bypass
-  if (username.value === 'test' && password.value === '1234') {
-    try { localStorage.setItem('isAuthenticated', 'true'); } catch (_) {}
-    router.push('/admin');
-    isLoading.value = false;
-    return;
-  }
+  // if (username.value === 'test' && password.value === '1234') {
+  //   try {
+  //     localStorage.setItem('isAuthenticated', 'true');
+  //     const token = btoa(`${username.value}:${password.value}`);
+  //     localStorage.setItem('basicToken', token);
+  //   } catch (_) {}
+  //   router.push('/admin');
+  //   isLoading.value = false;
+  //   return;
+  // }
   
   try {
-    const params = new URLSearchParams();
-    params.append('username', username.value);
-    params.append('password', password.value);
-
-    // Spring Security form login endpoint
-    await api.post('/admin/login', params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
+    // Basic Auth를 위한 로그인 API 호출 (POST /login with JSON)
+    await api.post('/admin/login', {
+      username: username.value,
+      password: password.value
     });
 
-    // 간단한 클라이언트 상태 표시 (실제 인증은 세션으로 처리)
-    try { localStorage.setItem('isAuthenticated', 'true'); } catch (_) {}
+    // 성공 시 Basic Auth 토큰 생성 및 저장
+    try { 
+      const token = btoa(`${username.value}:${password.value}`);
+      localStorage.setItem('basicToken', token);
+      localStorage.setItem('isAuthenticated', 'true'); 
+    } catch (_) {}
     
     // 성공 시 대시보드로 이동
     router.push('/admin');

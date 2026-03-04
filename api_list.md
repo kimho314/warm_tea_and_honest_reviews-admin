@@ -31,7 +31,7 @@ POST /admin/login
 - Authenticates an admin using form login
 - Managed by Spring Security
 
-**Request (Form Data)**
+**Request Body**
 
 ```
 username=<string>
@@ -40,13 +40,12 @@ password=<string>
 
 **Success Response**
 
-- HTTP 302 redirect to `/admin`
-- HTTP Session created
+- HTTP 200
 
 **Failure Response**
 
-- HTTP 401 or 403
-- Error message returned to login page
+- HTTP 401
+- Error message returned
 
 ---
 
@@ -65,7 +64,7 @@ POST /admin/logout
 
 **Success Response**
 
-- HTTP 302 redirect to `/admin/login`
+- HTTP 302 redirect to `/login`
 - Session invalidated
 
 ---

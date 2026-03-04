@@ -6,13 +6,13 @@ import ReviewDetailView from '../views/ReviewDetailView.vue'
 
 const routes = [
   {
-    path: '/admin/login',
+    path: '/login',
     name: 'Login',
     component: LoginView
   },
   {
     path: '/',
-    redirect: '/admin/login'
+    redirect: '/login'
   },
   {
     path: '/admin',
@@ -39,12 +39,12 @@ const router = createRouter({
 
 // Navigation Guard: 로그인 여부 확인
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true' || !!localStorage.getItem('basicToken');
   console.info('isAuthenticated:', isAuthenticated);
-  if (to.path.startsWith('/admin') && to.path !== '/admin/login' && !isAuthenticated) {
+  if (to.path.startsWith('/admin') && !isAuthenticated) {
     // 로그인이 필요한 페이지에 접근 시 로그인 페이지로 리다이렉트
-    next('/admin/login');
-  } else if (to.path === '/admin/login' && isAuthenticated) {
+    next('/login');
+  } else if (to.path === '/login' && isAuthenticated) {
     // 이미 로그인된 상태에서 로그인 페이지 접근 시 대시보드로 이동
     next('/admin');
   } else {

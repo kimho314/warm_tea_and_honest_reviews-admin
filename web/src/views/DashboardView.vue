@@ -108,13 +108,19 @@ onMounted(() => fetchReviews(1));
 const handleLogout = async () => {
   try {
     await api.post('/admin/logout');
-    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
-    router.push('/admin/login');
+    try { 
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('basicToken');
+    } catch (_) {}
+    router.push('/login');
   } catch (err) {
     console.error('Logout failed:', err);
     // 세션이 이미 만료된 경우에도 로그인 페이지로 이동
-    try { localStorage.removeItem('isAuthenticated'); } catch (_) {}
-    router.push('/admin/login');
+    try { 
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('basicToken');
+    } catch (_) {}
+    router.push('/login');
   }
 };
 </script>

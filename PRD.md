@@ -60,27 +60,26 @@ Admin accounts are **manually created directly in MongoDB** by the developer.
 
 ## 5. Functional Requirements
 
-> **Authentication Method**: Form-based login using Spring Security
+> **Authentication Method**: Basic Authentication login using Spring Security
 >
-> - Username (or email) + password authentication
-> - Session-based authentication (HTTP Session)
-> - No JWT or token-based authentication
+> - Username + password authentication
+> - Base64 encode Username:password
 
 ### 5.1 Authentication (Form Login)
 
 #### 5.1.1 Login
 
 - Admin logs in using:
-  - Username or email
+  - Username
   - Password
 
 - Credentials are validated by the backend
-- Spring Security form login is used
-- On successful login:
-  - An HTTP session is created
-  - Admin is redirected to the admin dashboard
+- Spring Security Basic Authentication login is used
+- On successful login(Http Status 200):
+  - encode username:password in base64
+  - At each time API call put encoded username:password in header
 
-- On failed login:
+- On failed login(Http Status 401):
   - An error message is displayed
 
 #### 5.1.2 Logout
