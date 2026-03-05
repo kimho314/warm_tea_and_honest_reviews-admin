@@ -22,12 +22,28 @@
 
           <label>
             Rating (1–5) <span style="color: red;">*</span>
-            <input type="number" v-model.number="form.rating" min="1" max="5" step="0.1" required />
+            <input 
+              type="number" 
+              v-model.number="form.rating" 
+              min="1" 
+              max="5" 
+              step="0.5" 
+              required 
+              @blur="touched.rating = true"
+            />
+            <span v-if="touched.rating && !isRatingValid" class="error-msg">Rating must be between 1 and 5.</span>
           </label>
 
           <label>
             Page Count <span style="color: red;">*</span>
-            <input type="number" v-model.number="form.page" min="1" required />
+            <input 
+              type="number" 
+              v-model.number="form.page" 
+              min="1" 
+              required 
+              @blur="touched.page = true"
+            />
+            <span v-if="touched.page && !isPageValid" class="error-msg">Page Count must be greater than 0.</span>
           </label>
 
           <label>
@@ -36,8 +52,8 @@
           </label>
 
           <label>
-            Category <span style="color: red;">*</span>
-            <input type="text" v-model="form.category" required />
+            Categories (comma separated) <span style="color: red;">*</span>
+            <input type="text" v-model="categoryInput" placeholder="e.g. Fiction, Mystery" required />
           </label>
 
           <label>
@@ -86,15 +102,25 @@ import api from '../api';
 const router = useRouter();
 const isSubmitting = ref(false);
 
+const touched = reactive({
+  rating: false,
+  page: false
+});
+
+const isRatingValid = computed(() => form.rating >= 1 && form.rating <= 5);
+const isPageValid = computed(() => form.page > 0);
+
 const today = new Date().toISOString().split('T')[0];
+
+const categoryInput = ref('');
 
 const form = reactive({
   title: '',
   author: '',
-  rating: 5,
-  page: 0,
+  rating: '',
+  page: '',
   language: '',
-  category: '',
+  categories: [],
   publishedAt: today,
   excerpt: '',
   content: '',
@@ -102,13 +128,14 @@ const form = reactive({
 });
 
 const isFormValid = computed(() => {
+  const categories = categoryInput.value.split(',').map(c => c.trim()).filter(c => c !== '');
   return (
     form.title.trim() !== '' &&
     form.author.trim() !== '' &&
-    form.rating >= 1 && form.rating <= 5 &&
-    form.page > 0 &&
+    isRatingValid.value &&
+    isPageValid.value &&
     form.language.trim() !== '' &&
-    form.category.trim() !== '' &&
+    categories.length > 0 &&
     form.publishedAt !== '' &&
     form.content.trim() !== '' &&
     form.content !== '' && // Quill empty content check
@@ -133,7 +160,9 @@ const handleSubmit = async () => {
     
     formData.append('page', new Blob([form.page], { type: 'application/json' }));
     formData.append('language', new Blob([form.language], { type: 'application/json' }));
-    formData.append('category', new Blob([form.category], { type: 'application/json' }));
+    
+    const categories = categoryInput.value.split(',').map(c => c.trim()).filter(c => c !== '');
+    formData.append('category', new Blob([JSON.stringify(categories)], { type: 'application/json' }));
 
     formData.append('publishedAt', new Blob([form.publishedAt], { type: 'application/json' }));
     formData.append('excerpt', new Blob([form.excerpt], { type: 'application/json' }));
@@ -174,3 +203,12 @@ const handleLogout = async () => {
   }
 };
 </script>
+
+<style scoped>
+.error-msg {
+  color: red;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+</style>

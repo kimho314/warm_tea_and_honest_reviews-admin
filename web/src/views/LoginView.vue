@@ -39,19 +39,19 @@ const router = useRouter();
 
 const handleLogin = async () => {
   isLoading.value = true;
-  // error.value = ''; // 다음 시도 시에도 이전 에러 메시지를 유지함
+  error.value = ''; // 다음 시도 시에도 이전 에러 메시지를 유지함
   
-  // Test account bypass
-  // if (username.value === 'test' && password.value === '1234') {
-  //   try {
-  //     localStorage.setItem('isAuthenticated', 'true');
-  //     const token = btoa(`${username.value}:${password.value}`);
-  //     localStorage.setItem('basicToken', token);
-  //   } catch (_) {}
-  //   router.push('/admin');
-  //   isLoading.value = false;
-  //   return;
-  // }
+  //Test account bypass
+  if (username.value === 'test' && password.value === '1234') {
+    try {
+      localStorage.setItem('isAuthenticated', 'true');
+      const token = btoa(`${username.value}:${password.value}`);
+      localStorage.setItem('basicToken', token);
+    } catch (_) {}
+    router.push('/admin');
+    isLoading.value = false;
+    return;
+  }
   
   try {
     // Basic Auth를 위한 로그인 API 호출 (POST /login with JSON)

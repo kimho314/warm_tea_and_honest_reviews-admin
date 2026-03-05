@@ -64,6 +64,7 @@ mock.onPost('/admin/reviews').reply(config => {
     author: formData.get('author'),
     rating: Number(formData.get('rating')),
     reviewDate: formData.get('reviewDate'),
+    category: JSON.parse(formData.get('category')),
     coverImageUrl: 'https://via.placeholder.com/150', // 가짜 이미지 URL
     content: formData.get('content')
   };

@@ -14,6 +14,11 @@
           <p><strong>Author:</strong> {{ review.author }}</p>
           <p><strong>Rating:</strong> {{ review.rating }} / 5</p>
           <p><strong>Date:</strong> {{ review.publishedAt || review.createdAt }}</p>
+          <p v-if="review.category">
+            <strong>Categories:</strong> 
+            <span v-if="Array.isArray(review.category)">{{ review.category.join(', ') }}</span>
+            <span v-else>{{ review.category }}</span>
+          </p>
           <div v-if="coverImageUrl" style="margin-top: 1rem;">
             <img :src="coverImageUrl" alt="Cover Image" style="max-width: 200px; border: 1px solid #ddd;" />
           </div>
