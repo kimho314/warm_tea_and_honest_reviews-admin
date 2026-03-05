@@ -1,5 +1,6 @@
 package com.luna.warmteaandhonestreviews.controller;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
@@ -18,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.luna.warmteaandhonestreviews.dto.GetReviewsRespDto;
 import com.luna.warmteaandhonestreviews.dto.ReviewDto;
 import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
+import com.luna.warmteaandhonestreviews.service.CategoryService;
 import com.luna.warmteaandhonestreviews.service.ReviewService;
 import com.luna.warmteaandhonestreviews.service.StorageService;
 import com.luna.warmteaandhonestreviews.service.UserService;
@@ -47,6 +49,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.context.WebApplicationContext;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(ReviewController.class)
@@ -61,6 +64,8 @@ public class ReviewControllerTest {
     StorageService storageService;
     @MockitoBean
     UserService userService;
+    @MockitoBean
+    CategoryService categoryService;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext,
@@ -83,7 +88,7 @@ public class ReviewControllerTest {
         double rating = 4.5;
         int page = 300;
         String language = "English";
-        String category = "Fiction";
+        List<String> categories = List.of("Fiction");
         LocalDate publishedAt = LocalDate.now();
         LocalDate createdAt = LocalDate.now();
         String coverImage = "test cover image";
@@ -99,7 +104,7 @@ public class ReviewControllerTest {
                 rating,
                 page,
                 language,
-                category,
+                categories,
                 publishedAt,
                 createdAt,
                 coverImage,
@@ -129,7 +134,7 @@ public class ReviewControllerTest {
                     fieldWithPath("rating").description("review rating"),
                     fieldWithPath("page").description("review page"),
                     fieldWithPath("language").description("review language"),
-                    fieldWithPath("category").description("review category"),
+                    fieldWithPath("categories").description("review category"),
                     fieldWithPath("publishedAt").description("review published at"),
                     fieldWithPath("createdAt").description("review created at"),
                     fieldWithPath("coverImage").description("review cover image"),
@@ -152,7 +157,7 @@ public class ReviewControllerTest {
         double rating = 4.5;
         int bookPage = 300;
         String language = "English";
-        String category = "Fiction";
+        List<String> categories = List.of("Fiction");
         LocalDate publishedAt = LocalDate.now();
         LocalDate createdAt = LocalDate.now();
         String coverImage = "test cover image";
@@ -165,7 +170,7 @@ public class ReviewControllerTest {
             rating,
             bookPage,
             language,
-            category,
+            categories,
             publishedAt,
             createdAt,
             coverImage,
@@ -206,7 +211,7 @@ public class ReviewControllerTest {
                     fieldWithPath("reviews[].rating").description("An review's rating"),
                     fieldWithPath("reviews[].page").description("An review's book page"),
                     fieldWithPath("reviews[].language").description("An review's language"),
-                    fieldWithPath("reviews[].category").description("An review's category"),
+                    fieldWithPath("reviews[].categories").description("An review's category"),
                     fieldWithPath("reviews[].publishedAt").description("An review's published at"),
                     fieldWithPath("reviews[].createdAt").description("An review's created at"),
                     fieldWithPath("reviews[].coverImage").description("An review's cover image"),
@@ -237,6 +242,11 @@ public class ReviewControllerTest {
             .thenReturn(new SaveReviewRespDto(UUID.randomUUID().toString()));
         Mockito.when(userService.getUserIdByUsername(anyString()))
             .thenReturn(adminUserId);
+        Mockito.doNothing().when(categoryService).saveNewCategories(anyList());
+
+        List<String> categories = List.of("Fiction");
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(categories);
 
         // when
         ResultActions perform = mockMvc.perform(multipart("/admin/reviews")
@@ -248,7 +258,7 @@ public class ReviewControllerTest {
             .part(new MockPart("rating", null, "4.5".getBytes(), MediaType.APPLICATION_JSON))
             .part(new MockPart("page", null, "300".getBytes(), MediaType.APPLICATION_JSON))
             .part(new MockPart("language", null, "English".getBytes(), MediaType.APPLICATION_JSON))
-            .part(new MockPart("category", null, "Fiction".getBytes(), MediaType.APPLICATION_JSON))
+            .part(new MockPart("category", null, json.getBytes(), MediaType.APPLICATION_JSON))
             .part(new MockPart("publishedAt", null, "2021-08-01".getBytes(),
                 MediaType.APPLICATION_JSON))
             .part(new MockPart("excerpt", null, "test excerpt".getBytes(),
@@ -273,33 +283,10 @@ public class ReviewControllerTest {
         //given
         String id = UUID.randomUUID().toString();
         String adminUserId = "162a59e1-571f-42a3-a41a-edc83b03618a";
-        String title = "test title";
-        String author = "test author";
-        double rating = 4.5;
-        int bookPage = 300;
-        String language = "English";
-        String category = "Fiction";
-        LocalDate publishedAt = LocalDate.now();
-        LocalDate createdAt = LocalDate.now();
         String coverImage = "test cover image";
-        String excerpt = "test excerpt";
-        String content = "<html><h1>Hello</html>";
 
         Mockito.when(reviewService.getReviewImage(anyString(), anyString()))
-            .thenReturn(new ReviewDto(id,
-                adminUserId,
-                title,
-                author,
-                rating,
-                bookPage,
-                language,
-                category,
-                publishedAt,
-                createdAt,
-                coverImage,
-                excerpt,
-                content
-            ));
+            .thenReturn(coverImage);
         ClassPathResource classPathResource = new ClassPathResource("IlkbaharRuyasi.jpg");
         Mockito.when(storageService.loadAsResource(anyString()))
             .thenReturn(classPathResource);

@@ -1,6 +1,8 @@
 package com.luna.warmteaandhonestreviews.domain;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -17,7 +19,7 @@ public class BookReviewEntity extends BaseEntity {
     private Double rating;
     private Integer page;
     private String language;
-    private String category;
+    private List<String> categories = new ArrayList<>();
     private Instant publishedAt;
     private String coverImage;
     private String contents;
@@ -33,7 +35,7 @@ public class BookReviewEntity extends BaseEntity {
         Double rating,
         Integer page,
         String language,
-        String category,
+        List<String> categories,
         Instant publishedAt,
         String coverImage,
         String contents,
@@ -45,7 +47,7 @@ public class BookReviewEntity extends BaseEntity {
             rating,
             page,
             language,
-            category,
+            categories,
             publishedAt,
             coverImage,
             contents,
@@ -59,7 +61,7 @@ public class BookReviewEntity extends BaseEntity {
         Double rating,
         Integer page,
         String language,
-        String category,
+        List<String> categories,
         Instant publishedAt,
         String coverImage,
         String contents,
@@ -71,7 +73,7 @@ public class BookReviewEntity extends BaseEntity {
         this.rating = rating;
         this.page = page;
         this.language = language;
-        this.category = category;
+        this.categories = categories;
         this.publishedAt = publishedAt;
         this.coverImage = coverImage;
         this.contents = contents;
@@ -106,8 +108,8 @@ public class BookReviewEntity extends BaseEntity {
         return language;
     }
 
-    public String getCategory() {
-        return category;
+    public List<String> getCategories() {
+        return categories;
     }
 
     public Instant getPublishedAt() {
@@ -144,16 +146,17 @@ public class BookReviewEntity extends BaseEntity {
     @Override
     public String toString() {
         return "BookReviewEntity{" +
-            "id='" + id + '\'' +
-            ", adminUserId='" + adminUserId + '\'' +
+            "id=" + id +
+            ", adminUserId=" + adminUserId +
             ", title='" + title + '\'' +
             ", author='" + author + '\'' +
             ", rating=" + rating +
             ", page=" + page +
             ", language='" + language + '\'' +
-            ", category='" + category + '\'' +
+            ", categories=" + categories +
             ", publishedAt=" + publishedAt +
             ", coverImage='" + coverImage + '\'' +
+            ", contents='" + contents + '\'' +
             ", excerpt='" + excerpt + '\'' +
             "} " + super.toString();
     }

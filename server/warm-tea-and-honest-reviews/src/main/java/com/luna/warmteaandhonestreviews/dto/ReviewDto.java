@@ -3,6 +3,7 @@ package com.luna.warmteaandhonestreviews.dto;
 import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 
 public record ReviewDto(String id,
                         String adminUserId,
@@ -11,7 +12,7 @@ public record ReviewDto(String id,
                         Double rating,
                         Integer page,
                         String language,
-                        String category,
+                        List<String> categories,
                         LocalDate publishedAt,
                         LocalDate createdAt,
                         String coverImage,
@@ -26,7 +27,7 @@ public record ReviewDto(String id,
             bookReviewEntity.getRating(),
             bookReviewEntity.getPage(),
             bookReviewEntity.getLanguage(),
-            bookReviewEntity.getCategory(),
+            bookReviewEntity.getCategories(),
             LocalDate.ofInstant(bookReviewEntity.getPublishedAt(), ZoneOffset.UTC),
             LocalDate.ofInstant(bookReviewEntity.getCreatedAt(), ZoneOffset.UTC),
             bookReviewEntity.getCoverImage(),

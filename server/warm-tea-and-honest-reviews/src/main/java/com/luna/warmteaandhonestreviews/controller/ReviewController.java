@@ -4,10 +4,13 @@ import com.luna.warmteaandhonestreviews.dto.GetReviewsRespDto;
 import com.luna.warmteaandhonestreviews.dto.ReviewDto;
 import com.luna.warmteaandhonestreviews.dto.SaveReviewReqDto;
 import com.luna.warmteaandhonestreviews.dto.SaveReviewRespDto;
+import com.luna.warmteaandhonestreviews.service.CategoryService;
 import com.luna.warmteaandhonestreviews.service.ReviewService;
 import com.luna.warmteaandhonestreviews.service.StorageService;
 import com.luna.warmteaandhonestreviews.service.UserService;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import tools.jackson.databind.ObjectMapper;
 
 @RestController
 public class ReviewController {
@@ -34,15 +38,18 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final StorageService storageService;
     private final UserService userService;
+    private final CategoryService categoryService;
 
     public ReviewController(
         ReviewService reviewService,
         StorageService storageService,
-        UserService userService
+        UserService userService,
+        CategoryService categoryService
     ) {
         this.reviewService = reviewService;
         this.storageService = storageService;
         this.userService = userService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping(value = "/admin/reviews/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,13 +87,13 @@ public class ReviewController {
         @RequestPart("rating") Double rating,
         @RequestPart("page") Integer page,
         @RequestPart("language") String language,
-        @RequestPart("category") String category,
+        @RequestPart("category") String categoryJson,
         @RequestPart("content") String contents,
         @RequestPart("publishedAt") @DateTimeFormat(pattern = "yyyy-MM-dd") String publishedAt,
         @RequestPart(value = "excerpt", required = false) String excerpt,
         @AuthenticationPrincipal UserDetails userDetails
     ) {
-
+        log.info("categories : {}", categoryJson);
         Optional<ReviewDto> maybeReview = reviewService.getByTitle(title);
         if (maybeReview.isPresent()) {
             return ResponseEntity.ok(new SaveReviewRespDto(maybeReview.get().id()));
@@ -94,6 +101,11 @@ public class ReviewController {
 
         String adminUserId = userService.getUserIdByUsername(userDetails.getUsername());
         storageService.store(file);
+
+        List<String> categories = convertCategoryJsonToList(categoryJson);
+        // check if there is new category from MongoDB, if not save it
+        categoryService.saveNewCategories(categories);
+
         SaveReviewRespDto resp = reviewService.save(
             new SaveReviewReqDto(
                 adminUserId,
@@ -102,7 +114,7 @@ public class ReviewController {
                 rating,
                 page,
                 language,
-                category,
+                categories,
                 LocalDate.parse(publishedAt),
                 excerpt,
                 file.getOriginalFilename(),
@@ -110,6 +122,12 @@ public class ReviewController {
             )
         );
         return ResponseEntity.ok(resp);
+    }
+
+    private @NonNull List<String> convertCategoryJsonToList(String categoryJson) {
+        ObjectMapper mapper = new ObjectMapper();
+        return Arrays.stream(mapper.readValue(categoryJson, String[].class))
+            .toList();
     }
 
 
@@ -121,9 +139,9 @@ public class ReviewController {
         log.info("name: {}, authority: {}", userDetails.getUsername(),
             userDetails.getAuthorities());
         String adminUserId = userService.getUserIdByUsername(userDetails.getUsername());
-        ReviewDto review = reviewService.getReviewImage(adminUserId, id);
+        String reviewImage = reviewService.getReviewImage(adminUserId, id);
 
-        Resource resource = storageService.loadAsResource(review.coverImage());
+        Resource resource = storageService.loadAsResource(reviewImage);
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + resource.getFilename() + "\"")

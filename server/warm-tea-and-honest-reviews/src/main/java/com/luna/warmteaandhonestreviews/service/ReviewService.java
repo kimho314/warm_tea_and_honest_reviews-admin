@@ -25,19 +25,22 @@ public class ReviewService {
     }
 
     public ReviewDto getReview(@NonNull String adminUserId, @NonNull String reviewId) {
-        return bookReviewRepository.findByAdminUserIdAndId(new ObjectId(adminUserId),
-                new ObjectId(reviewId))
-            .map(ReviewDto::of)
-            .orElseThrow(
-                () -> new ReviewNotFoundException("Review not found with id: " + reviewId));
+        BookReviewEntity bookReview = bookReviewRepository.findByAdminUserIdAndId(
+            new ObjectId(adminUserId),
+            new ObjectId(reviewId)
+        ).orElseThrow(() -> new ReviewNotFoundException("Review not found with id: " + reviewId));
+
+        return ReviewDto.of(bookReview);
     }
 
-    public ReviewDto getReviewImage(@NonNull String adminUserId, @NonNull String reviewId) {
-        return bookReviewRepository.findByAdminUserIdAndId(new ObjectId(adminUserId),
-                new ObjectId(reviewId))
-            .map(ReviewDto::of)
+    public String getReviewImage(@NonNull String adminUserId, @NonNull String reviewId) {
+        BookReviewEntity bookReview = bookReviewRepository.findByAdminUserIdAndId(
+                new ObjectId(adminUserId),
+                new ObjectId(reviewId)
+            )
             .orElseThrow(
                 () -> new ReviewNotFoundException("Review not found with id: " + reviewId));
+        return bookReview.getCoverImage();
     }
 
     public GetReviewsRespDto getReviews(@NonNull String adminUserId,

@@ -5,6 +5,7 @@ import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import com.luna.warmteaandhonestreviews.domain.UserEntity;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import org.bson.types.ObjectId;
 
 public class AbstractTest {
@@ -23,7 +24,7 @@ public class AbstractTest {
         4.3,
         300,
         "English",
-        "Fiction",
+        List.of("Fiction", "Romance"),
         LocalDateTime.now().toInstant(ZoneOffset.UTC),
         "/image1",
         "contents1",
@@ -34,7 +35,7 @@ public class AbstractTest {
         4.0,
         200,
         "English",
-        "Romance",
+        List.of("SyFi"),
         LocalDateTime.now().toInstant(ZoneOffset.UTC),
         "/image2",
         "contents2",

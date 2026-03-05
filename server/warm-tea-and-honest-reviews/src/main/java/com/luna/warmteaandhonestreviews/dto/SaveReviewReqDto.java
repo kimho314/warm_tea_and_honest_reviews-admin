@@ -3,6 +3,7 @@ package com.luna.warmteaandhonestreviews.dto;
 import com.luna.warmteaandhonestreviews.domain.BookReviewEntity;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.List;
 import org.bson.types.ObjectId;
 
 public record SaveReviewReqDto(String adminUserId,
@@ -11,7 +12,7 @@ public record SaveReviewReqDto(String adminUserId,
                                Double rating,
                                Integer page,
                                String language,
-                               String category,
+                               List<String> categories,
                                LocalDate publishedAt,
                                String excerpt,
                                String coverImage,
@@ -24,7 +25,7 @@ public record SaveReviewReqDto(String adminUserId,
             rating,
             page,
             language,
-            category,
+            categories,
             publishedAt.atStartOfDay(ZoneOffset.UTC).toInstant(),
             coverImage,
             contents,
