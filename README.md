@@ -9,23 +9,26 @@ Built with Vite and Vue 3, it integrates with a backend (Spring Boot) to provide
 - **Build Tool**: Vite
 - **Routing**: Vue Router
 - **HTTP Client**: Axios
-- **Styling**: Plain CSS (maintaining original reference design)
+- **Rich Text Editor**: Vue Quill
+- **Styling**: Plain CSS
 
 ## 📁 Project Structure
 
 ```text
-web/
+warm-tea-and-honest-reviews-admin/
 ├── src/
 │   ├── api/            # API client configuration (Axios)
 │   ├── assets/         # CSS stylesheets and static assets
-│   ├── router/         # Vue Router configuration and route definitions
-│   ├── views/          # Page components (Login, Dashboard, AddReview)
-│   └── App.vue         # Root component
-├── reference/          # Original reference HTML/CSS files
+│   ├── components/     # Reusable UI components
+│   ├── router/         # Vue Router configuration
+│   ├── views/          # Page components (Login, Dashboard, AddReview, ReviewDetail)
+│   ├── App.vue         # Root component
+│   └── main.js         # Application entry point
 ├── public/             # Static resources
-├── index.html          # Main HTML file
-├── vite.config.js      # Vite configuration (including proxy settings)
-├── package.json        # Dependency and script definitions
+├── reference/          # Original reference HTML/CSS files
+├── index.html          # Main HTML template
+├── vite.config.js      # Vite configuration (proxy settings)
+├── package.json        # Dependencies and scripts
 ├── PRD.md              # Product Requirements Document
 └── api_list.md         # API Specification
 ```
@@ -33,14 +36,16 @@ web/
 ## ✨ Features
 
 - **Admin Authentication**: 
-  - Supports Spring Security form login.
-  - Uses session-based authentication.
+  - Supports Spring Security Basic Authentication.
+  - Maintains session via cookies and locally stored credentials for API requests.
 - **Dashboard**: 
-  - Provides an admin-only menu and logout functionality.
-- **Add Book Review**: 
-  - Input metadata such as book title, author, rating, and date.
+  - Overview of existing reviews with pagination.
+  - Admin-only navigation and logout functionality.
+- **Add/View Book Review**: 
+  - Input metadata such as book title, author, rating, page count, language, categories, and date.
   - Upload cover image files.
-  - Compose review bodies via Word files (.docx) or direct HTML input.
+  - Compose review content using a rich text editor (Quill).
+  - Detailed view of published reviews.
 
 ## 🚀 Getting Started
 
@@ -63,7 +68,7 @@ npm install
 npm run dev
 ```
 
-Requests to `/admin` and `/api` are forwarded to `http://localhost:8080` (Spring Boot server) via the proxy configured in `vite.config.js`.
+Requests to `/admin` and `/api` are forwarded to the backend server (configured in `vite.config.js`).
 
 ### Build
 
@@ -74,6 +79,7 @@ npm run build
 
 ## 🔐 Security & Backend Integration
 
-- **CORS & Session**: The `withCredentials: true` option is applied to Axios requests to enable session sharing with the backend.
-- **API Specification**: Please refer to `api_list.md` for detailed API information.
-- **Requirements**: Please refer to `PRD.md` for detailed functional requirements.
+- **CORS & Session**: The `withCredentials: true` option is applied to Axios requests to enable session sharing. 
+- **Authentication**: Uses Basic Authentication. Credentials are stored in `localStorage` as a Base64-encoded string (`basicToken`) and included in the `Authorization` header for each request.
+- **API Specification**: See `api_list.md` for details.
+- **Requirements**: See `PRD.md` for functional requirements.
