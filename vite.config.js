@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/admin': {
-        target: 'http://localhost:8080',
+        target: 'http://84.235.166.193:8080',
         changeOrigin: true,
         // 브라우저 내비게이션(HTML 요청)일 경우 프록시를 통과하지 않고 index.html로 우회
         bypass: (req) => {
@@ -22,7 +22,7 @@ export default defineConfig({
         }
       },
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://84.235.166.193:8080',
         changeOrigin: true
       }
     }
