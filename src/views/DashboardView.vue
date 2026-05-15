@@ -32,7 +32,8 @@
                 <td style="padding: 0.5rem;">{{ review.rating }} / 5</td>
                 <td style="padding: 0.5rem;">{{ review.publishedAt || review.createdAt }}</td>
                 <td style="padding: 0.5rem;">
-                  <router-link :to="'/admin/reviews/' + review.id">View</router-link>
+                  <router-link :to="'/admin/reviews/' + review.id" style="margin-right: 0.5rem;">View</router-link>
+                  <button @click="handleDelete(review.id)" style="color: red; cursor: pointer; border: none; background: none; padding: 0; text-decoration: underline;">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -100,6 +101,23 @@ const fetchReviews = async (page = 1) => {
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     fetchReviews(page);
+  }
+};
+
+const handleDelete = async (id) => {
+  if (!confirm('Are you sure you want to delete this review?')) {
+    return;
+  }
+  
+  try {
+    await api.delete(`/admin/reviews/${id}`);
+    alert('Review deleted successfully');
+    // 현재 페이지가 1보다 크고 현재 페이지의 데이터가 하나뿐이었을 경우 이전 페이지로 이동할지 고민할 수 있으나
+    // 단순하게 현재 페이지를 다시 불러오는 것으로 구현
+    fetchReviews(currentPage.value);
+  } catch (err) {
+    console.error('Failed to delete review:', err);
+    alert('Failed to delete review');
   }
 };
 

@@ -20,10 +20,6 @@ export default defineConfig({
             return '/index.html';
           }
         }
-      },
-      '/api': {
-        target: 'http://84.235.166.193:8080',
-        changeOrigin: true
       }
     }
   }
