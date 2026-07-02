@@ -59,7 +59,9 @@ const toggleLamp = () => {
   try {
     const audio = new Audio('https://raw.githubusercontent.com/StarKnightt/Light-Bulb/main/click.mp3');
     audio.volume = 0.2;
-    audio.play().catch(() => {}); // Ignore errors if browser blocks autoplay
+    audio.play().catch((reason) => {
+      console.warn(reason);
+    }); // Ignore errors if browser blocks autoplay
   } catch (e) {}
 
   setTimeout(() => {
