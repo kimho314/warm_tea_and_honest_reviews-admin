@@ -1,6 +1,18 @@
 <template>
-  <div class="auth-body">
-    <main class="auth-container">
+  <div class="auth-body" :class="{ 'light-on': isLampOn }">
+    <div class="lamp-container">
+      <div class="lamp">
+        <div class="lamp-shade"></div>
+        <div class="lamp-stand"></div>
+        <div class="pull-chain" @click="toggleLamp" :class="{ 'pulled': isPulled }">
+          <div class="chain-line"></div>
+          <div class="chain-knob"></div>
+        </div>
+        <div class="lamp-light" v-if="isLampOn"></div>
+      </div>
+    </div>
+
+    <main class="auth-container" :style="{ visibility: isLampOn ? 'visible' : 'hidden', pointerEvents: isLampOn ? 'all' : 'none' }">
       <h1 class="auth-title">Admin Login</h1>
 
       <form @submit.prevent="handleLogin" class="auth-form">
@@ -35,7 +47,26 @@ const username = ref('');
 const password = ref('');
 const error = ref('');
 const isLoading = ref(false);
+const isLampOn = ref(false);
+const isPulled = ref(false);
 const router = useRouter();
+
+const toggleLamp = () => {
+  if (isPulled.value) return; // Prevent double clicks
+  isPulled.value = true;
+  
+  // Try to play a click sound if available (optional)
+  try {
+    const audio = new Audio('https://raw.githubusercontent.com/StarKnightt/Light-Bulb/main/click.mp3');
+    audio.volume = 0.2;
+    audio.play().catch(() => {}); // Ignore errors if browser blocks autoplay
+  } catch (e) {}
+
+  setTimeout(() => {
+    isPulled.value = false;
+    isLampOn.value = !isLampOn.value;
+  }, 150);
+};
 
 const handleLogin = async () => {
   isLoading.value = true;
