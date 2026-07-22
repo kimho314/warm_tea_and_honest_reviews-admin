@@ -33,6 +33,7 @@
                 <td style="padding: 0.5rem;">{{ review.publishedAt || review.createdAt }}</td>
                 <td style="padding: 0.5rem;">
                   <router-link :to="'/admin/reviews/' + review.id" style="margin-right: 0.5rem;">View</router-link>
+                  <router-link :to="'/admin/reviews/' + review.id + '/edit'" style="margin-right: 0.5rem;">Edit</router-link>
                   <button @click="handleDelete(review.id)" style="color: red; cursor: pointer; border: none; background: none; padding: 0; text-decoration: underline;">Delete</button>
                 </td>
               </tr>

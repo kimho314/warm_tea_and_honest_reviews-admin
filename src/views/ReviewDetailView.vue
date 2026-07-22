@@ -35,7 +35,8 @@
         </section>
 
         <div class="form-actions">
-          <button @click="router.push('/admin')">Back to Dashboard</button>
+          <button @click="router.push('/admin')" style="margin-right: 1rem;">Back to Dashboard</button>
+          <button @click="router.push('/admin/reviews/' + route.params.id + '/edit')">Edit Review</button>
         </div>
       </article>
     </main>
