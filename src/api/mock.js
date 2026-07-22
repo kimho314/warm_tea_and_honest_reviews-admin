@@ -113,6 +113,40 @@ mock.onGet(/\/admin\/reviews\/[a-zA-Z0-9-]+/).reply(config => {
   return review ? [200, review] : [404, { message: 'Review not found' }];
 });
 
+// Delete Book Review
+mock.onDelete(/\/admin\/reviews\/[a-zA-Z0-9-]+/).reply(config => {
+  const id = config.url.split('/').pop();
+  const index = reviews.findIndex(r => r.id === id);
+  if (index !== -1) {
+    reviews.splice(index, 1);
+    return [200];
+  } else {
+    return [404, { message: 'Review not found' }];
+  }
+});
+
+// Update Book Review
+mock.onPut(/\/admin\/reviews\/[a-zA-Z0-9-]+/).reply(config => {
+  const id = config.url.split('/').pop();
+  const formData = config.data;
+  const index = reviews.findIndex(r => r.id === id);
+  
+  if (index !== -1) {
+    const updatedReview = {
+      ...reviews[index],
+      title: formData.get('title') instanceof Blob ? 'Updated Title' : (formData.get('title') || reviews[index].title),
+      author: formData.get('author') instanceof Blob ? 'Updated Author' : (formData.get('author') || reviews[index].author),
+      // Simplified mock handling for Blobs
+    };
+    
+    // In a real mock we'd parse Blobs, but here we just want to avoid errors
+    reviews[index] = updatedReview;
+    return [200, updatedReview];
+  } else {
+    return [404, { message: 'Review not found' }];
+  }
+});
+
 console.log('Mock API initialized');
 
 export default mock;
